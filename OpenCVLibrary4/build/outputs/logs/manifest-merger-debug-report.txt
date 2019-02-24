@@ -1,0 +1,37 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:2:1-6:12
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:2:1-6:12
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:2:1-6:12
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:2:1-6:12
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:2:1-6:12
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:2:1-6:12
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:2:1-6:12
+	package
+		ADDED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:3:7-27
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+	android:versionName
+		ADDED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:5:7-34
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:2:11-69
+	android:versionCode
+		ADDED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml:4:7-33
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+uses-sdk
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+		ADDED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+		ADDED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
+		INJECTED from C:\AndroidStudioProjects\FYP\OpenCVLibrary4\AndroidManifest.xml
