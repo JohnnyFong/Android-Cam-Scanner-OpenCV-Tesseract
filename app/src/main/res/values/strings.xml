@@ -20,4 +20,6 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="show_camera">Show Camera</string>
+    <string name="captured_photo_desc">Captured Photo</string>
+    <string name="gallery">Gallery</string>
 </resources>
