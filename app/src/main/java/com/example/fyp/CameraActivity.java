@@ -65,7 +65,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void openCV(){
-        Toast.makeText(this,"Opencv starting",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Opencv starting",Toast.LENGTH_LONG).show();
     }
 
     public void openCamera(){
