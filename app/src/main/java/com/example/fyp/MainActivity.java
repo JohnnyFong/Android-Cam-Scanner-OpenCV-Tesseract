@@ -52,14 +52,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navigationView.setCheckedItem(R.id.nav_scan);
         }
 
-//        Button camButton = (Button) findViewById(R.id.show_camera_button);
-//        camButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent openCamera = new Intent (MainActivity.this,OpenCamera.class);
-//                startActivity(openCamera);
-//            }
-//        });
     }
 
     @Override

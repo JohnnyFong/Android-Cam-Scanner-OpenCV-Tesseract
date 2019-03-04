@@ -22,4 +22,6 @@
     <string name="show_camera">Show Camera</string>
     <string name="captured_photo_desc">Captured Photo</string>
     <string name="gallery">Gallery</string>
+    <string name="cancel">Cancel</string>
+    <string name="cont">Continue</string>
 </resources>
