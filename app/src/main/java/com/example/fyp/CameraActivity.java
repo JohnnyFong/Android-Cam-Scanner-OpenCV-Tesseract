@@ -22,12 +22,20 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+
 import static android.os.Environment.getExternalStoragePublicDirectory;
 
 public class CameraActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;
+
+    ImageView photo = null;
+
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -40,7 +48,7 @@ public class CameraActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 1);
         }
         setContentView(R.layout.activity_camera);
-
+        photo = (ImageView) findViewById(R.id.bitmap_photo);
         openCamera();
 
         Button cancelButton = (Button) findViewById(R.id.Cancel_button);
@@ -65,7 +73,35 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void openCV(){
+        Mat imageGray = new Mat();
+        Mat imageCny = new Mat();
+
         Toast.makeText(this,"Opencv starting",Toast.LENGTH_LONG).show();
+        Imgproc.cvtColor(Imgcodecs.imread(currentPhotoPath),imageGray, Imgproc.COLOR_BGR2RGB);
+        Imgproc.Canny(imageGray,imageCny,10,100,3,true);
+        File photoFile = null;
+        try{
+            photoFile = createImageFile();
+        }catch(Exception ex){
+            Toast.makeText(this,ex.toString(), Toast.LENGTH_LONG).show();
+        }
+        if(photoFile != null){
+            Uri photoURI = FileProvider.getUriForFile(this,
+                    "com.example.android.fileprovider",
+                    photoFile);
+            Imgcodecs.imwrite(photoURI.toString(),imageCny);
+        }else{
+            Toast.makeText(this,"failed", Toast.LENGTH_LONG).show();
+        }
+        galleryAddPic();
+        try{
+            Bitmap imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
+
+            photo.setImageBitmap(imageBitmap);
+        }catch(Exception ex){
+            Toast.makeText(this,ex.toString(), Toast.LENGTH_LONG).show();
+        }
+
     }
 
     public void openCamera(){
@@ -110,14 +146,11 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("myTag", "This is my message");
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             galleryAddPic();
-            Log.d("myTag1", "Here");
-            Log.d("phototag",currentPhotoPath);
             try{
                 Bitmap imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
-                ImageView photo = (ImageView) findViewById(R.id.bitmap_photo);
+
                 photo.setImageBitmap(imageBitmap);
             }catch(Exception ex){
                 ex.printStackTrace();
@@ -131,6 +164,6 @@ public class CameraActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
-        Log.d("myTag2", "Hereeee");
     }
+
 }
