@@ -22,6 +22,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -35,11 +39,41 @@ public class CameraActivity extends AppCompatActivity {
     String currentPhotoPath;
 
     ImageView photo = null;
-
+    Mat imageGray = null;
+    Mat imageCny = null;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS:
+                {
+                    Log.i("opencv","OpenCV loaded successfully");
+
+                } break;
+                default:
+                {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
+
+    public void onResume()
+    {
+        super.onResume();
+        if (!OpenCVLoader.initDebug()) {
+            Log.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
+        } else {
+            Log.d("OpenCV", "OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +97,14 @@ public class CameraActivity extends AppCompatActivity {
         contButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                new Thread(new Runnable(){
+//                    @Override
+//                    public void run() {
+//                        openCV();
+//                    }
+//                }).start();
                 openCV();
+
             }
         });
     }
@@ -73,10 +114,13 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void openCV(){
-        Mat imageGray = new Mat();
-        Mat imageCny = new Mat();
+        if( ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 1);
+        }
+        imageGray = new Mat();
+        imageCny = new Mat();
 
-        Toast.makeText(this,"Opencv starting",Toast.LENGTH_LONG).show();
+        //Toast.makeText(this,"Opencv starting",Toast.LENGTH_LONG).show();
         Imgproc.cvtColor(Imgcodecs.imread(currentPhotoPath),imageGray, Imgproc.COLOR_BGR2RGB);
         Imgproc.Canny(imageGray,imageCny,10,100,3,true);
         File photoFile = null;
@@ -89,18 +133,23 @@ public class CameraActivity extends AppCompatActivity {
             Uri photoURI = FileProvider.getUriForFile(this,
                     "com.example.android.fileprovider",
                     photoFile);
-            Imgcodecs.imwrite(photoURI.toString(),imageCny);
+            Boolean a= Imgcodecs.imwrite(photoURI.toString(),imageCny);
+            Log.d("imwrite",imageCny.toString() + photoURI.toString() + a);
         }else{
             Toast.makeText(this,"failed", Toast.LENGTH_LONG).show();
         }
-        galleryAddPic();
-        try{
-            Bitmap imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
+        Bitmap bm = Bitmap.createBitmap(imageCny.cols(), imageCny.rows(),Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(imageCny, bm);
 
-            photo.setImageBitmap(imageBitmap);
+        try{
+            //Bitmap imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
+
+            photo.setImageBitmap(bm);
         }catch(Exception ex){
-            Toast.makeText(this,ex.toString(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(this,ex.toString(), Toast.LENGTH_LONG).show();
+            Log.d("bitmap",ex.toString());
         }
+        //galleryAddPic();
 
     }
 
@@ -130,12 +179,12 @@ public class CameraActivity extends AppCompatActivity {
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "PNG_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         Log.d("storage",storageDir.toString());
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
+                ".png",         /* suffix */
                 storageDir      /* directory */
         );
 
@@ -148,13 +197,6 @@ public class CameraActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             galleryAddPic();
-            try{
-                Bitmap imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
-
-                photo.setImageBitmap(imageBitmap);
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
         }
     }
 
@@ -164,6 +206,14 @@ public class CameraActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+        try{
+            Bitmap imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
+
+            photo.setImageBitmap(imageBitmap);
+        }catch(Exception ex){
+            //Toast.makeText(this,ex.toString(), Toast.LENGTH_LONG).show();
+            Log.d("bitmap",ex.toString());
+        }
     }
 
 }
