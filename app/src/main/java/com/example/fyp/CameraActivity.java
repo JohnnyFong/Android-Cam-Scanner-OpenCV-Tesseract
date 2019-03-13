@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -133,12 +134,17 @@ public class CameraActivity extends AppCompatActivity {
 
         //Toast.makeText(this,"Opencv starting",Toast.LENGTH_LONG).show();
         Imgproc.cvtColor(imageSource,imageGray, Imgproc.COLOR_BGR2GRAY);
+        //Imgproc.threshold(imageGray,imageGray,25,255,Imgproc.THRESH_BINARY);
         Imgproc.bilateralFilter(imageGray,imageBilateral,9,75,75);
         Imgproc.adaptiveThreshold(imageBilateral,imageThreshold,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY,115,4);
         Imgproc.medianBlur(imageThreshold,imageBlur,11);
+        Imgproc.GaussianBlur(imageSource,imageSource,new Size(5,5),5);
         Core.copyMakeBorder(imageBlur,imageBorder,5,5,5,5,Core.BORDER_CONSTANT);
         Imgproc.Canny(imageBorder,imageSource,10, 100, 3, true);
-        Imgproc.GaussianBlur(imageSource,imageSource,new Size(5,5),5);
+
+
+        //find the contour
+        Vector v = new Vector<>();
 
         //find the contours
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
@@ -174,58 +180,72 @@ public class CameraActivity extends AppCompatActivity {
         Imgproc.cvtColor(imageSource, imageSource, Imgproc.COLOR_BayerBG2RGB);
         Imgproc.drawContours(imageSource, largest_contours, -1, new Scalar(0, 255, 0), 1);
 
+
         //calculate the center of mass of our contour image using moments
-        Moments moment = Imgproc.moments(largest_contours.get(0));
-        int x = (int) (moment.get_m10() / moment.get_m00());
-        int y = (int) (moment.get_m01() / moment.get_m00());
+//        Moments moment = Imgproc.moments(largest_contours.get(0));
+//        int x = (int) (moment.get_m10() / moment.get_m00());
+//        int y = (int) (moment.get_m01() / moment.get_m00());
+//
+//        //SORT POINTS RELATIVE TO CENTER OF MASS
+//        Point[] sortedPoints = new Point[4];
+//
+//        double[] data;
+//        int count = 0;
+//        for(int i=0; i<largest_contours.get(0).rows(); i++){
+//            data = largest_contours.get(0).get(i, 0);
+//            double datax = data[0];
+//            double datay = data[1];
+//            if(datax < x && datay < y){
+//                sortedPoints[0]=new Point(datax,datay);
+//                count++;
+//            }else if(datax > x && datay < y){
+//                sortedPoints[1]=new Point(datax,datay);
+//                count++;
+//            }else if (datax < x && datay > y){
+//                sortedPoints[2]=new Point(datax,datay);
+//                count++;
+//            }else if (datax > x && datay > y){
+//                sortedPoints[3]=new Point(datax,datay);
+//                count++;
+//            }
+//        }
+//
+//        MatOfPoint2f src = new MatOfPoint2f(
+//                sortedPoints[0],
+//                sortedPoints[1],
+//                sortedPoints[2],
+//                sortedPoints[3]
+//        );
+//
+//
+//        MatOfPoint2f dst = new MatOfPoint2f(
+//                new Point(0, 0),
+//                new Point(imageSource.width()-1,0),
+//                new Point(imageSource.width()-1,imageSource.height()-1),
+//                new Point(0,imageSource.height()-1)
+//        );
+//
 
-        //SORT POINTS RELATIVE TO CENTER OF MASS
-        Point[] sortedPoints = new Point[4];
+//        MatOfPoint2f dst = new MatOfPoint2f(
+//                new Point(0, 0),
+//                new Point(imageSource.width()-1,0),
+//                new Point(0,imageSource.height()-1),
+//                new Point(imageSource.width()-1,imageSource.height()-1)
+//
+//        );
 
-        double[] data;
-        int count = 0;
-        for(int i=0; i<largest_contours.get(0).rows(); i++){
-            data = largest_contours.get(0).get(i, 0);
-            double datax = data[0];
-            double datay = data[1];
-            if(datax < x && datay < y){
-                sortedPoints[0]=new Point(datax,datay);
-                count++;
-            }else if(datax > x && datay < y){
-                sortedPoints[1]=new Point(datax,datay);
-                count++;
-            }else if (datax < x && datay > y){
-                sortedPoints[2]=new Point(datax,datay);
-                count++;
-            }else if (datax > x && datay > y){
-                sortedPoints[3]=new Point(datax,datay);
-                count++;
-            }
-        }
-
-        MatOfPoint2f src = new MatOfPoint2f(
-                sortedPoints[0],
-                sortedPoints[1],
-                sortedPoints[2],
-                sortedPoints[3]);
+//
+//        Mat warpMat = Imgproc.getPerspectiveTransform(src,dst);
+//        //This is you new image as Mat
+//        Mat destImage = new Mat();
+//        Imgproc.warpPerspective(imageSource, destImage, warpMat, imageSource.size());
 
 
-        MatOfPoint2f dst = new MatOfPoint2f(
-                new Point(0, 0),
-                new Point(imageSource.width(),0),
-                new Point(imageSource.width(),imageSource.height()),
-                new Point(0,imageSource.height())
-        );
+//        Bitmap bm = Bitmap.createBitmap(destImage.cols(), destImage.rows(),Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(destImage, bm);
 
-
-        Mat warpMat = Imgproc.getPerspectiveTransform(src,dst);
-        //This is you new image as Mat
-        Mat destImage = new Mat();
-        Imgproc.warpPerspective(imageSource, destImage, warpMat, imageSource.size());
-
-
-        Bitmap bm = Bitmap.createBitmap(destImage.cols(), destImage.rows(),Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(destImage, bm);
+        Bitmap bm = Bitmap.createBitmap(imageSource.cols(), imageSource.rows(),Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(imageSource, bm);
 
 
         try{
