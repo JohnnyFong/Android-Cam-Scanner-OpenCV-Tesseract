@@ -65,7 +65,11 @@ public class OpenCVUtils {
         List<MatOfPoint2f> rectangles = getPoints(downscaled);
         if (rectangles.size() == 0) {
             Log.d("bitmap","rectangles size is 0, null");
-            return null;
+            //cant detect returning a default box
+//            Mat defaultMat = bitmapToMat(bitmap);
+//            defaultMat.convertTo(defaultMat,CvType.CV_8U);
+//            MatOfPoint2f defaultRec = new MatOfPoint2f(defaultMat);
+//            return defaultRec;
         }
         Collections.sort(rectangles, AreaDescendingComparator);
         MatOfPoint2f largestRectangle = rectangles.get(0);
@@ -109,7 +113,7 @@ public class OpenCVUtils {
                     // HACK: Use Canny instead of zero threshold level.
                     // Canny helps to catch squares with gradient shading.
                     // NOTE: No kernel size parameters on Java API.
-                    Imgproc.Canny(gray0, gray, 10, 20);
+                    Imgproc.Canny(gray0, gray, 10, 100);
 
                     // Dilate Canny output to remove potential holes between edge segments.
                     Imgproc.dilate(gray, gray, Mat.ones(new Size(3, 3), 0));
@@ -129,9 +133,9 @@ public class OpenCVUtils {
                     MatOfPoint2f approx = new MatOfPoint2f();
                     Imgproc.approxPolyDP(contourFloat, approx, arcLen, true);
 
-                    if (isRectangle(approx, srcArea)) {
+                    //if (isRectangle(approx, srcArea)) {
                         rectangles.add(approx);
-                    }
+                    //}
                 }
             }
         }

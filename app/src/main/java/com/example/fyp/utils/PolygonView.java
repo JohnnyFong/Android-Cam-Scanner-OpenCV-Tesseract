@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -25,6 +26,7 @@ public class PolygonView extends FrameLayout{
     private ImageView ptr1, ptr2, ptr3, ptr4; //pointers for all 4 corners
     private ImageView mPtr13, mPtr12, mPtr34, mPtr24; // pointers between the corner
     private PolygonView polygonView;
+    private boolean validation = true;//validate shape
 
     public PolygonView(Context context) {
         super(context);
@@ -224,8 +226,12 @@ public class PolygonView extends FrameLayout{
                     int color = 0;
                     if (isValidShape(getPoints())) {
                         color = getResources().getColor(R.color.blue);
+                        validation = true;
+                        //btn.setEnabled(true);
                     } else {
-                        color = getResources().getColor(R.color.orange);
+                        color = getResources().getColor(R.color.red);
+                        validation = false;
+                        //btn.setEnabled(false);
                     }
                     paint.setColor(color);
                     break;
@@ -272,8 +278,10 @@ public class PolygonView extends FrameLayout{
                     int color = 0;
                     if (isValidShape(getPoints())) {
                         color = getResources().getColor(R.color.blue);
+                        validation = true;
                     } else {
-                        color = getResources().getColor(R.color.orange);
+                        color = getResources().getColor(R.color.red);
+                        validation = false;
                     }
                     paint.setColor(color);
                     break;
@@ -283,7 +291,10 @@ public class PolygonView extends FrameLayout{
             polygonView.invalidate();
             return true;
         }
+    }
 
+    public boolean shapeValidate(){
+        return validation;
     }
 
 

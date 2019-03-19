@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.fyp.utils.ImageConstant;
 import com.example.fyp.utils.OpenCVUtils;
@@ -27,8 +28,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
 
 public class CropImageActivity extends AppCompatActivity {
 
@@ -76,9 +75,15 @@ public class CropImageActivity extends AppCompatActivity {
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ImageConstant.selectedImageBitmap = getCroppedImage();
-                Intent intent = new Intent(getApplicationContext(),CroppedImageActivity.class);
-                startActivity(intent);
+                if(polygonView.shapeValidate()){
+                    ImageConstant.selectedImageBitmap = getCroppedImage();
+                    Intent intent = new Intent(getApplicationContext(),CroppedImageActivity.class);
+                    startActivity(intent);
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"Unable to process the shape, please try re-adjusting or re-take a clear picture.",Toast.LENGTH_LONG).show();
+                }
+
             }
         });
     }
