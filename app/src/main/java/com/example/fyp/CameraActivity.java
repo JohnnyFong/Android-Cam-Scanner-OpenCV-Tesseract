@@ -99,19 +99,15 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ImageMethod = getIntent().getIntExtra("ImageMethod",0);
-
+        ImageMethod = getIntent().getIntExtra("ImageMethod",0); //get the request code from previous activity
+        // check if ImageMethod, if is 0, go back
         if(ImageMethod != 0) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 1);
             }
             setContentView(R.layout.activity_camera);
             photo = (ImageView) findViewById(R.id.bitmap_photo);
-            if (ImageMethod == ImageConstant.REQUEST_IMAGE_CAPTURE) {
-                openCamera();
-            } else if (ImageMethod == ImageConstant.REQUEST_IMAGE_GALLERY) {
-                loadGallery();
-            }
+
             Button cancelButton = (Button) findViewById(R.id.Cancel_button);
             cancelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -129,13 +125,24 @@ public class CameraActivity extends AppCompatActivity {
                         ImageConstant.selectedImageBitmap = imageBitmap;
                         Intent intent = new Intent(getApplicationContext(), CropImageActivity.class);
                         startActivity(intent);
+                    }else{
+                        Toast.makeText(getApplicationContext(),"No photo detected, please try again.",Toast.LENGTH_LONG).show();
+                        back();
                     }
-
-
                 }
             });
+
+            //check the request code, 1 for image capture, 2 for choose from gallery
+            if (ImageMethod == ImageConstant.REQUEST_IMAGE_CAPTURE) {
+                openCamera();
+            } else if (ImageMethod == ImageConstant.REQUEST_IMAGE_GALLERY) {
+                loadGallery();
+            }else{
+                back();
+            }
+
         }else{
-            onBackPressed();
+            back();
         }
     }
 
@@ -297,8 +304,7 @@ public class CameraActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ImageConstant.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             galleryAddPic();
-        }
-        if (requestCode == ImageConstant.REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK) {
+        }else if (requestCode == ImageConstant.REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK) {
             galleryImage = data.getData();
             try{
                 InputStream inputStream = getContentResolver().openInputStream(this.galleryImage);

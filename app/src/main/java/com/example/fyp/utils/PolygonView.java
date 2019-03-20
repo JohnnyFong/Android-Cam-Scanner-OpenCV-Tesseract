@@ -147,7 +147,7 @@ public class PolygonView extends FrameLayout{
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        canvas.drawLine(ptr1.getX() + (ptr1.getWidth() / 1), ptr1.getY() + (ptr1.getHeight() / 2), ptr3.getX() + (ptr3.getWidth() / 2), ptr3.getY() + (ptr3.getHeight() / 2), paint);
+        canvas.drawLine(ptr1.getX() + (ptr1.getWidth() / 2), ptr1.getY() + (ptr1.getHeight() / 2), ptr3.getX() + (ptr3.getWidth() / 2), ptr3.getY() + (ptr3.getHeight() / 2), paint);
         canvas.drawLine(ptr1.getX() + (ptr1.getWidth() / 2), ptr1.getY() + (ptr1.getHeight() / 2), ptr2.getX() + (ptr2.getWidth() / 2), ptr2.getY() + (ptr2.getHeight() / 2), paint);
         canvas.drawLine(ptr2.getX() + (ptr2.getWidth() / 2), ptr2.getY() + (ptr2.getHeight() / 2), ptr4.getX() + (ptr4.getWidth() / 2), ptr4.getY() + (ptr4.getHeight() / 2), paint);
         canvas.drawLine(ptr3.getX() + (ptr3.getWidth() / 2), ptr3.getY() + (ptr3.getHeight() / 2), ptr4.getX() + (ptr4.getWidth() / 2), ptr4.getY() + (ptr4.getHeight() / 2), paint);
