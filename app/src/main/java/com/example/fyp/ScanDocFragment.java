@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.fyp.utils.ImageConstant;
+
 import com.example.fyp.R;
 
 public class ScanDocFragment extends Fragment {
@@ -17,18 +19,38 @@ public class ScanDocFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scan_document, container,false);
         Button camButton = (Button) view.findViewById(R.id.show_camera_button);
+        Button galButton = (Button) view.findViewById(R.id.gallery_button);
+
         camButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent MainIntent = new Intent(view.getContext(), CameraActivity.class);
-                startActivity(MainIntent);
+                getImage(view, ImageConstant.REQUEST_IMAGE_CAPTURE);
+//                Intent MainIntent = new Intent(view.getContext(), CameraActivity.class);
+//                MainIntent.putExtra("ImageMethod", ImageConstant.REQUEST_IMAGE_CAPTURE);
+//                startActivity(MainIntent);
             }
         });
+
+        galButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getImage(view, ImageConstant.REQUEST_IMAGE_GALLERY);
+//                Intent MainIntent = new Intent(view.getContext(), CameraActivity.class);
+//                MainIntent.putExtra("ImageMethod", ImageConstant.REQUEST_IMAGE_GALLERY);
+//                startActivity(MainIntent);
+            }
+        });
+
         return view;
 
 
     }
 
+    private void getImage(View view, int REQUEST_CODE){
+        Intent MainIntent = new Intent(view.getContext(), CameraActivity.class);
+        MainIntent.putExtra("ImageMethod", REQUEST_CODE);
+        startActivity(MainIntent);
+    }
 
 
 

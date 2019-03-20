@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -21,6 +23,7 @@ import com.example.fyp.utils.ImageConstant;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,9 +51,9 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
 public class CameraActivity extends AppCompatActivity {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    int ImageMethod;
     String currentPhotoPath;
-
+    Uri galleryImage;
     ImageView photo = null;
     Bitmap imageBitmap = null;
     Mat imageGray = null;
@@ -96,41 +99,56 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if( ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 1);
-        }
-        setContentView(R.layout.activity_camera);
-        photo = (ImageView) findViewById(R.id.bitmap_photo);
-        openCamera();
+        ImageMethod = getIntent().getIntExtra("ImageMethod",0);
 
-        Button cancelButton = (Button) findViewById(R.id.Cancel_button);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                back();
+        if(ImageMethod != 0) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 1);
             }
-        });
-
-        Button contButton = (Button) findViewById(R.id.Continue_button);
-        contButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //openCV();
-                if(imageBitmap != null){
-                    ImageConstant.selectedImageBitmap = imageBitmap;
-                    Intent intent = new Intent(getApplicationContext(),CropImageActivity.class);
-                    startActivity(intent);
+            setContentView(R.layout.activity_camera);
+            photo = (ImageView) findViewById(R.id.bitmap_photo);
+            if (ImageMethod == ImageConstant.REQUEST_IMAGE_CAPTURE) {
+                openCamera();
+            } else if (ImageMethod == ImageConstant.REQUEST_IMAGE_GALLERY) {
+                loadGallery();
+            }
+            Button cancelButton = (Button) findViewById(R.id.Cancel_button);
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    back();
                 }
+            });
+
+            Button contButton = (Button) findViewById(R.id.Continue_button);
+            contButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //openCV();
+                    if (imageBitmap != null) {
+                        ImageConstant.selectedImageBitmap = imageBitmap;
+                        Intent intent = new Intent(getApplicationContext(), CropImageActivity.class);
+                        startActivity(intent);
+                    }
 
 
-            }
-        });
+                }
+            });
+        }else{
+            onBackPressed();
+        }
     }
 
     public void back(){
         onBackPressed();
     }
 
+
+    public void loadGallery(){
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, ImageMethod);
+    }
 
 //    public void openCV(){
 //        if( ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
@@ -275,6 +293,23 @@ public class CameraActivity extends AppCompatActivity {
 //
 //    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ImageConstant.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            galleryAddPic();
+        }
+        if (requestCode == ImageConstant.REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK) {
+            galleryImage = data.getData();
+            try{
+                InputStream inputStream = getContentResolver().openInputStream(this.galleryImage);
+                imageBitmap = BitmapFactory.decodeStream(inputStream);
+                photo.setImageBitmap(imageBitmap);
+            }catch(Exception ex){
+                Toast.makeText(getApplicationContext(),"Opps, something went wrong. Picture is unable to be displayed. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     public void openCamera(){
         Toast.makeText(this,"Starting camera....", Toast.LENGTH_LONG).show();
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -293,7 +328,7 @@ public class CameraActivity extends AppCompatActivity {
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                startActivityForResult(takePictureIntent, ImageMethod);
             }
         }
     }
@@ -315,13 +350,6 @@ public class CameraActivity extends AppCompatActivity {
         return image;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            galleryAddPic();
-        }
-    }
-
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(currentPhotoPath);
@@ -330,11 +358,9 @@ public class CameraActivity extends AppCompatActivity {
         this.sendBroadcast(mediaScanIntent);
         try{
             imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
-
             photo.setImageBitmap(imageBitmap);
         }catch(Exception ex){
-            //Toast.makeText(this,ex.toString(), Toast.LENGTH_LONG).show();
-            Log.d("bitmap",ex.toString());
+            Toast.makeText(getApplicationContext(),"Opps, something went wrong. Picture is unable to be displayed. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
