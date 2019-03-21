@@ -303,7 +303,15 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ImageConstant.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            galleryAddPic();
+            if(currentPhotoPath != null) {
+                ImageConstant.galleryAddPic(currentPhotoPath, this);
+                try{
+                    imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
+                    photo.setImageBitmap(imageBitmap);
+                }catch(Exception ex){
+                    Toast.makeText(getApplicationContext(),"Opps, something went wrong. Picture is unable to be displayed. Please try again.", Toast.LENGTH_SHORT).show();
+                }
+            }
         }else if (requestCode == ImageConstant.REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK) {
             galleryImage = data.getData();
             try{
@@ -324,7 +332,8 @@ public class CameraActivity extends AppCompatActivity {
             // Create the File where the photo should go
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = ImageConstant.createImageFile();
+                currentPhotoPath = photoFile.getAbsolutePath();
             } catch (IOException ex) {
                 Toast.makeText(this,ex.toString(), Toast.LENGTH_LONG).show();
             }
@@ -335,38 +344,9 @@ public class CameraActivity extends AppCompatActivity {
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, ImageMethod);
+            }else{
+                Toast.makeText(this,"photoFile is null.",Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "PNG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        Log.d("storage",storageDir.toString());
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".png",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(currentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
-        try{
-            imageBitmap =  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(currentPhotoPath)));
-            photo.setImageBitmap(imageBitmap);
-        }catch(Exception ex){
-            Toast.makeText(getApplicationContext(),"Opps, something went wrong. Picture is unable to be displayed. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
