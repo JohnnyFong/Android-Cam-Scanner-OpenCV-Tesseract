@@ -1,7 +1,6 @@
 package com.example.fyp.utils;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -18,9 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.example.fyp.utils.BitmapUtils;
-import com.example.fyp.utils.MatUtils;
-
 import static com.example.fyp.utils.BitmapUtils.*;
 import static com.example.fyp.utils.MatUtils.*;
 
@@ -31,8 +27,6 @@ public class OpenCVUtils {
     }
 
     private static final int THRESHOLD_LEVEL = 2;
-    private static final double AREA_LOWER_THRESHOLD = 0.2;
-    private static final double AREA_UPPER_THRESHOLD = 0.98;
     private static final double DOWNSCALE_IMAGE_SIZE = 600f;
 
     public Bitmap getScannedBitmap(Bitmap bitmap, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
@@ -61,23 +55,14 @@ public class OpenCVUtils {
         Size downscaledSize = new Size(src.width() * ratio, src.height() * ratio);
         Mat downscaled = new Mat(downscaledSize, src.type());
         Imgproc.resize(src, downscaled, downscaledSize);
-
+        //Image Pre-processing and Image Segmentation
         List<MatOfPoint2f> rectangles = getPoints(downscaled);
-        if (rectangles.size() == 0) {
-            Log.d("bitmap","rectangles size is 0, null");
-            //cant detect returning a default box
-//            Mat defaultMat = bitmapToMat(bitmap);
-//            defaultMat.convertTo(defaultMat,CvType.CV_8U);
-//            MatOfPoint2f defaultRec = new MatOfPoint2f(defaultMat);
-//            return defaultRec;
-        }
         Collections.sort(rectangles, AreaDescendingComparator);
         MatOfPoint2f largestRectangle = rectangles.get(0);
         MatOfPoint2f result = scaleRectangle(largestRectangle, 1f / ratio);
         return result;
     }
 
-    //public native float[] getPoints(Bitmap bitmap);
     public List<MatOfPoint2f> getPoints(Mat src) {
 
         // Blur the image to filter out the noise.
@@ -97,9 +82,6 @@ public class OpenCVUtils {
         List<Mat> destinations = new ArrayList<>();
         destinations.add(gray0);
 
-        // To filter rectangles by their areas.
-        int srcArea = src.rows() * src.cols();
-
         // Find squares in every color plane of the image.
         for (int c = 0; c < 3; c++) {
             int[] ch = {c, 0};
@@ -110,9 +92,7 @@ public class OpenCVUtils {
             // Try several threshold levels.
             for (int l = 0; l < THRESHOLD_LEVEL; l++) {
                 if (l == 0) {
-                    // HACK: Use Canny instead of zero threshold level.
-                    // Canny helps to catch squares with gradient shading.
-                    // NOTE: No kernel size parameters on Java API.
+                    //Use Canny Edge Detection
                     Imgproc.Canny(gray0, gray, 10, 100);
 
                     // Dilate Canny output to remove potential holes between edge segments.
@@ -132,48 +112,11 @@ public class OpenCVUtils {
                     // Approximate polygonal curves.
                     MatOfPoint2f approx = new MatOfPoint2f();
                     Imgproc.approxPolyDP(contourFloat, approx, arcLen, true);
-
-                    //if (isRectangle(approx, srcArea)) {
-                        rectangles.add(approx);
-                    //}
+                    // Add the approximated polygon into rectangles
+                    rectangles.add(approx);
                 }
             }
         }
         return rectangles;
-
-    }
-
-    private boolean isRectangle(MatOfPoint2f polygon, int srcArea) {
-        MatOfPoint polygonInt = toMatOfPointInt(polygon);
-
-        if (polygon.rows() != 4) {
-            return false;
-        }
-
-        double area = Math.abs(Imgproc.contourArea(polygon));
-        if (area < srcArea * AREA_LOWER_THRESHOLD || area > srcArea * AREA_UPPER_THRESHOLD) {
-            return false;
-        }
-
-        if (!Imgproc.isContourConvex(polygonInt)) {
-            return false;
-        }
-
-        // Check if the all angles are more than 72.54 degrees (cos 0.3).
-        double maxCosine = 0;
-        Point[] approxPoints = polygon.toArray();
-
-        for (int i = 2; i < 5; i++) {
-            double cosine = Math.abs(angle(approxPoints[i % 4], approxPoints[i - 2], approxPoints[i - 1]));
-            maxCosine = Math.max(cosine, maxCosine);
-        }
-
-        if (maxCosine >= 0.3) {
-            Log.d("bitmap", "return false");
-            return false;
-        }
-        Log.d("bitmap", "return true");
-        return true;
-
     }
 }

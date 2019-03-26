@@ -35,7 +35,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CroppedImageActivity"></activity>
+        <activity android:name=".ExtractedInfoActivity"></activity>
+        <activity android:name=".CroppedImageActivity" />
         <activity android:name=".CropImageActivity" />
         <activity android:name=".CameraActivity" />
         <activity

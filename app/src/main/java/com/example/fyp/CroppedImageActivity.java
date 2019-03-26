@@ -1,5 +1,6 @@
 package com.example.fyp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.graphics.Bitmap;
@@ -33,20 +34,28 @@ public class CroppedImageActivity extends AppCompatActivity {
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                File photoFile = null;
-                try {
-                    photoFile = ImageConstant.createImageFile();
+                if(selectedImageBM != null) {
 
-                }catch(IOException ex){
-                    Toast.makeText(getApplicationContext(),"Error.",Toast.LENGTH_LONG).show();
+                    File photoFile = null;
+                    try {
+                        photoFile = ImageConstant.createImageFile();
+
+                    } catch (IOException ex) {
+                        Toast.makeText(getApplicationContext(), "Error.", Toast.LENGTH_LONG).show();
+                    }
+                    ImageConstant.addPic(selectedImageBM, photoFile);
+                    ImageConstant.galleryAddPic(photoFile.getAbsolutePath(), getApplicationContext());
+
+                    Toast.makeText(getApplicationContext(), "Image saved to device.", Toast.LENGTH_LONG).show();
+
+                    ImageConstant.selectedImageBitmap = selectedImageBM;
+                    Intent intent = new Intent(getApplicationContext(), ExtractedInfoActivity.class);
+                    startActivity(intent);
+
                 }
-                ImageConstant.addPic(selectedImageBM,photoFile);
-                ImageConstant.galleryAddPic(photoFile.getAbsolutePath(),getApplicationContext());
-
-                Toast.makeText(getApplicationContext(),"Image saved to device.",Toast.LENGTH_LONG).show();
-
 
             }
         });
     }
+
 }
