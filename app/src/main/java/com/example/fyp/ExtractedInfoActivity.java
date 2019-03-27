@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,14 +30,15 @@ public class ExtractedInfoActivity extends AppCompatActivity {
     OCRUtils OCR;
     TextView resultView;
     Bitmap receiptBM;
-
+    ImageView imageView;
+    Bitmap bm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_extracted_info);
         receiptBM = ImageConstant.selectedImageBitmap;
         ImageConstant.selectedImageBitmap = null;
-
+        imageView = findViewById(R.id.imageView);
         resultView = findViewById(R.id.resultView);
 
         getTessData();
@@ -99,7 +101,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
 
                 Imgproc.threshold(gray, gray, 85, 255, Imgproc.THRESH_BINARY);
 
-                Bitmap bm = BitmapUtils.matToBitmap(gray);
+                bm = BitmapUtils.matToBitmap(gray);
 
                 temp = OCR.getOCRResult(bm);
 
@@ -116,6 +118,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                 return;
             }
             resultView.setText(foundString);
+            imageView.setImageBitmap(bm);
         }
     }
 }
