@@ -11,8 +11,6 @@ import android.widget.Button;
 
 import com.example.fyp.utils.ImageConstant;
 
-import com.example.fyp.R;
-
 public class ScanDocFragment extends Fragment {
     @Nullable
     @Override
@@ -25,9 +23,6 @@ public class ScanDocFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 getImage(view, ImageConstant.REQUEST_IMAGE_CAPTURE);
-//                Intent MainIntent = new Intent(view.getContext(), CameraActivity.class);
-//                MainIntent.putExtra("ImageMethod", ImageConstant.REQUEST_IMAGE_CAPTURE);
-//                startActivity(MainIntent);
             }
         });
 
@@ -35,9 +30,6 @@ public class ScanDocFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 getImage(view, ImageConstant.REQUEST_IMAGE_GALLERY);
-//                Intent MainIntent = new Intent(view.getContext(), CameraActivity.class);
-//                MainIntent.putExtra("ImageMethod", ImageConstant.REQUEST_IMAGE_GALLERY);
-//                startActivity(MainIntent);
             }
         });
 

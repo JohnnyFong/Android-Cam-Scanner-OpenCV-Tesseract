@@ -24,4 +24,7 @@
     <string name="gallery">Gallery</string>
     <string name="cancel">Cancel</string>
     <string name="cont">Continue</string>
+    <string name="register">Register</string>
+
+
 </resources>

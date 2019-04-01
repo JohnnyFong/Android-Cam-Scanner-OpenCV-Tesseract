@@ -90,6 +90,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                 //change bitmap to map
                 Mat gray = new Mat();
                 Mat source = BitmapUtils.bitmapToMat(receiptBM);
+                //pre-processing
                 Imgproc.cvtColor(source,gray, Imgproc.COLOR_BGR2GRAY);
 
                 Mat element1 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2), new Point(1, 1));

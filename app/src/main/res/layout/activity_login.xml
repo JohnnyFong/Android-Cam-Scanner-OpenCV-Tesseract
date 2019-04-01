@@ -30,7 +30,16 @@
             android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="56dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp">
+
+            <!--<ImageView android:src="@drawable/logo"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="72dp"-->
+                <!--android:layout_marginBottom="24dp"-->
+                <!--android:layout_gravity="center_horizontal" />-->
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -71,9 +80,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/action_sign_in"
+                android:text="@string/action_sign_in_short"
                 android:textStyle="bold" />
 
+
+            <TextView
+                android:id="@+id/registerText"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="Don't have an account? Click HERE to register" />
         </LinearLayout>
+
     </ScrollView>
+
 </LinearLayout>

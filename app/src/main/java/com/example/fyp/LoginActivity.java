@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
+    private TextView registerText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +89,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 attemptLogin();
+            }
+        });
+
+        registerText = findViewById(R.id.registerText);
+        registerText.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent registerIntent = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(registerIntent);
             }
         });
 
@@ -146,7 +155,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        Intent MainIntent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent MainIntent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(MainIntent);
         Toast.makeText(LoginActivity.this,"Signed in", Toast.LENGTH_LONG).show();
 //        if (mAuthTask != null) {
