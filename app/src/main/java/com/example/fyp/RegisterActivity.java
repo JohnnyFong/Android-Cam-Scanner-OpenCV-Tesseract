@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,9 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth fireAuth;
-    private FirebaseAuth.AuthStateListener fireAuthLis;
-    private DatabaseReference fireDatabase;
 
+    private ScrollView registerScroll;
     private EditText inputEmail, inputPassword, inputName;
     private Button btnRegister;
     private TextView loginText, managerText;
@@ -39,6 +39,10 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        registerScroll = findViewById(R.id.register_scroll);
+        registerScroll.setVerticalScrollBarEnabled(false);
+        registerScroll.setHorizontalScrollBarEnabled(false);
+
         btnRegister = findViewById(R.id.btn_register);
         inputEmail = findViewById(R.id.input_email);
         inputPassword = findViewById(R.id.input_password);
@@ -47,6 +51,9 @@ public class RegisterActivity extends AppCompatActivity {
         departmentSpiner = findViewById(R.id.department_spinner);
         managerText = findViewById(R.id.managerText);
         managerSpinner = findViewById(R.id.manager_spinner);
+
+        //get firebase instance
+        fireAuth = FirebaseAuth.getInstance();
 
         loginText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,17 +85,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         loadDepartment();
 
-        //get firebase instance
-        fireAuth = FirebaseAuth.getInstance();
-        //get database instance
-        fireDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
-        fireAuthLis = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-            }
-        };
 
     }
 
@@ -111,12 +108,13 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
+                    //login successful add profile logic needed.
                     Toast.makeText(getApplicationContext(), "User Created" , Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
                     startActivity(intent);
                     finish();
                 }else{
-                    Toast.makeText(getApplicationContext(), "Authentication failed." + task.getException(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Register failed." + task.getException(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
