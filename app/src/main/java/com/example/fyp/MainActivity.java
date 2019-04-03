@@ -98,7 +98,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             doubleBack = false;
         } else {
             if(doubleBack){
-                super.onBackPressed();
+                finish();
+//                super.onBackPressed();
+//                finishAffinity();
+//                System.exit(0);
             }
             this.doubleBack = true;
             Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();

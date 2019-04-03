@@ -98,7 +98,7 @@ public class LoginActivity extends AppCompatActivity  {
                     startActivity(MainIntent);
                     Toast.makeText(LoginActivity.this,"Signed in", Toast.LENGTH_SHORT).show();
                 }else{
-                    Toast.makeText(getApplicationContext(), "Invalid Email or Password. Please try again later." + task.getException(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Invalid Email or Password. Please try again later." , Toast.LENGTH_SHORT).show();
                 }
             }
         });
