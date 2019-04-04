@@ -36,6 +36,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,12 @@ public class LoginActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(currentUser != null){
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
         setContentView(R.layout.activity_login);
         // Set up the login form.
 
@@ -96,6 +103,7 @@ public class LoginActivity extends AppCompatActivity  {
                 if(task.isSuccessful()){
                     Intent MainIntent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(MainIntent);
+                    finish();
                     Toast.makeText(LoginActivity.this,"Signed in", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(getApplicationContext(), "Invalid Email or Password. Please try again later." , Toast.LENGTH_SHORT).show();
