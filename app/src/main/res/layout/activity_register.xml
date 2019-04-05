@@ -79,7 +79,7 @@
                 android:layout_marginBottom="8dp">
 
                 <EditText
-                    android:id="@+id/input_phone"
+                    android:id="@+id/input_phnum"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Phone number"

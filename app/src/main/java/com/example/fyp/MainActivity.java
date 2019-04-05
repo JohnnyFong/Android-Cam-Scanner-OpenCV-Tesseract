@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     AlertDialog.Builder builder;
     private FirebaseAuth fireAuth;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,8 +85,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         };
-
-
     }
 
     @Override
@@ -98,10 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             doubleBack = false;
         } else {
             if(doubleBack){
-                finish();
-//                super.onBackPressed();
-//                finishAffinity();
-//                System.exit(0);
+                finish();//exit the application
             }
             this.doubleBack = true;
             Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
