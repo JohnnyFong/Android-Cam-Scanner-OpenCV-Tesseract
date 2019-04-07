@@ -137,7 +137,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         Log.d("mmmm", d.getName());
         ArrayList<String> managers = d.getLineManager();
-        //if(managers.get(0) == "") {
+        try {
             for (String manager : managers) {
                 Log.d("mmmm", manager);
                 Log.d("mmmm", managers.toString());
@@ -160,10 +160,10 @@ public class RegisterActivity extends AppCompatActivity {
                 });
             }
             userAdapter.notifyDataSetChanged();
-//        }else{
-//            Toast.makeText(getApplicationContext(), "This department has no line manager.", Toast.LENGTH_SHORT).show();
-//        }
-
+        }catch(IllegalArgumentException ex){
+            managerSpinner.setAdapter(null);
+            Toast.makeText(getApplicationContext(), "This department has no line manager yet.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void registerUser(){
