@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Department {
+    private String id;
     private String name;
     private ArrayList<String> lineManager;
 
@@ -12,9 +13,18 @@ public class Department {
 
     }
 
-    public Department(String name, ArrayList<String> lineManager) {
+    public Department(String id, String name, ArrayList<String> lineManager) {
+        this.id = id;
         this.name = name;
         this.lineManager = lineManager;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public ArrayList<String> getLineManager() {

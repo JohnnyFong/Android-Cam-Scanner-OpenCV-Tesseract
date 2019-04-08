@@ -49,6 +49,13 @@ public class RegisterActivity extends AppCompatActivity {
     private Spinner departmentSpiner, managerSpinner;
     private User user;
 
+    private String email;
+    private String password;
+    private String name;
+    private String phnum;
+    private String department;
+    private String lineManager;
+
     ArrayAdapter<Department> departmentAdapter;
     ArrayAdapter<User> userAdapter;
     List<Department> departments = new ArrayList<>();
@@ -86,7 +93,10 @@ public class RegisterActivity extends AppCompatActivity {
                     //check if there are any department
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //for each department found add it to the adapter for department spinner
-                        departmentAdapter.add(document.toObject(Department.class));
+                        Department d = document.toObject(Department.class);
+                        d.setId(document.getId());
+                        departmentAdapter.add(d);
+                        Log.d("department",d.getId() + " " +d.getName() + " " +d.getLineManager());
                     }
                     // update the spinner
                     departmentAdapter.notifyDataSetChanged();
@@ -149,7 +159,9 @@ public class RegisterActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                userAdapter.add(document.toObject(User.class));
+                                User u = document.toObject(User.class);
+                                u.setId(document.getId());
+                                userAdapter.add(u);
                             } else {
                                 Toast.makeText(getApplicationContext(), "Something went wrong. No line Manager available. Please try again later.", Toast.LENGTH_SHORT).show();
                             }
@@ -167,12 +179,14 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registerUser(){
-        final String email = inputEmail.getText().toString().trim();
-        final String password = inputPassword.getText().toString().trim();
-        final String name = inputName.getText().toString();
-        final String phnum = inputPhnum.getText().toString();
-        final String department = departmentSpiner.getSelectedItem().toString();
-        final String lineManager = managerSpinner.getSelectedItem().toString();
+        email = inputEmail.getText().toString().trim();
+        password = inputPassword.getText().toString().trim();
+        name = inputName.getText().toString();
+        phnum = inputPhnum.getText().toString();
+        Department d = (Department) departmentSpiner.getSelectedItem();
+        department = d.getId();
+        User u = (User) managerSpinner.getSelectedItem();
+        lineManager = u.getId();
 
         fireAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -180,7 +194,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     //login successful add profile logic needed.
                     FirebaseUser fbUser = fireAuth.getCurrentUser();
-                    user = new User(name,email,phnum,department,lineManager);
+                    user = new User(fbUser.getUid(),name,email,phnum,department,lineManager);
 
 //                    Map<String, Object> userObj = new HashMap<>();
 //                    userObj.put("name", user.getName());

@@ -2,6 +2,7 @@ package com.example.fyp.utils;
 
 public class User {
 
+    private String id;
     private String name;
     private String email;
     private String phnum;
@@ -12,12 +13,21 @@ public class User {
 
     }
 
-    public User(String name, String email, String phnum, String department, String lineManager) {
+    public User(String id, String name, String email, String phnum, String department, String lineManager) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.phnum = phnum;
         this.department = department;
         this.lineManager = lineManager;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -64,4 +74,6 @@ public class User {
     public String toString() {
         return name;
     }
+
+
 }
