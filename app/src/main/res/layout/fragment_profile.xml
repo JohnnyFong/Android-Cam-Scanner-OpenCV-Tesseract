@@ -63,31 +63,55 @@
                     android:hint="Password"/>
             </android.support.design.widget.TextInputLayout>
 
-            <!--  Department Label -->
+            <!-- Phone number Label -->
             <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_department"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:hint="Department" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <EditText
+                    android:id="@+id/input_phnum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Phone number"
+                    android:inputType="phone" />
             </android.support.design.widget.TextInputLayout>
 
-            <!--  Line manager Label -->
-            <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_lineManager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:hint="Line Manager" />
-            </android.support.design.widget.TextInputLayout>
+            <TextView
+                android:id="@+id/department_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Your Department"
+                android:textColor="?android:textColorHint"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingBottom="7dp"
+                />
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/department_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dialog"
+                android:background="@drawable/abc_edit_text_material"
+                style="@style/Widget.AppCompat.Spinner.Underlined" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/managerText"
+                android:text="Your Line Manager"
+                android:textColor="?android:textColorHint"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingBottom="7dp" />
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/manager_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dialog"
+                android:background="@drawable/abc_edit_text_material"
+                style="@style/Widget.AppCompat.Spinner.Underlined" />
 
             <!-- Signup Button -->
             <android.support.v7.widget.AppCompatButton
