@@ -1,5 +1,6 @@
 package com.example.fyp;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import com.example.fyp.utils.Department;
 import com.example.fyp.utils.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -83,7 +85,27 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void updateProfile(){
+        email = inputEmail.getText().toString().trim();
+        name = inputName.getText().toString();
+        phnum = inputPhnum.getText().toString();
+        Department d = (Department) departmentSpiner.getSelectedItem();
+        department = d.getId();
+        User u = (User) managerSpinner.getSelectedItem();
+        lineManager = u.getId();
 
+        User updateUser = new User(fireUser.getUid(),name,email,phnum,department,lineManager);
+        fireStore.collection("users").document(fireUser.getUid()).set(updateUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(getApplicationContext(), "User profile has been updated" , Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Something went wrong. User not created. Please try again later." , Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     private void loadProfile(){
