@@ -68,9 +68,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.getHeaderView(0).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                drawer.closeDrawer(GravityCompat.START);
+                Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
+                startActivity(intent);
             }
         });
 

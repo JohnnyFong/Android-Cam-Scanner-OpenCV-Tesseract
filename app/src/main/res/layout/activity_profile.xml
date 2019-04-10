@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.widget.ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileFragment">
+    tools:context=".ProfileActivity"
+    android:id="@+id/profile_scroll">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -22,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="72dp"
                 android:layout_marginBottom="24dp"
-            android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal" />
 
             <!--  Name Label -->
             <android.support.design.widget.TextInputLayout
@@ -51,17 +52,17 @@
             </android.support.design.widget.TextInputLayout>
 
             <!-- Password Label -->
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-                <EditText android:id="@+id/input_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:hint="Password"/>
-            </android.support.design.widget.TextInputLayout>
+            <!--<android.support.design.widget.TextInputLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginTop="8dp"-->
+                <!--android:layout_marginBottom="8dp">-->
+                <!--<EditText android:id="@+id/input_password"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:inputType="textPassword"-->
+                    <!--android:hint="Password"/>-->
+            <!--</android.support.design.widget.TextInputLayout>-->
 
             <!-- Phone number Label -->
             <android.support.design.widget.TextInputLayout
@@ -113,7 +114,7 @@
                 android:background="@drawable/abc_edit_text_material"
                 style="@style/Widget.AppCompat.Spinner.Underlined" />
 
-            <!-- Signup Button -->
+            <!-- Update Button -->
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/update_button"
                 android:layout_width="fill_parent"
@@ -131,4 +132,4 @@
 
     </RelativeLayout>
 
-</ScrollView>
+</android.widget.ScrollView>

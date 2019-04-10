@@ -137,7 +137,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:gravity="center"
-                android:text="Already a member? Login" />
+                android:text="Already have an account? Tap HERE to Login" />
 
         </LinearLayout>
 
