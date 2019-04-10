@@ -112,12 +112,12 @@ public class ProfileActivity extends AppCompatActivity {
         fireStore.collection("users").document(fireUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                user = documentSnapshot.toObject(User.class);
-                inputEmail.setText(user.getEmail());
-                inputName.setText(user.getName());
-                inputPhnum.setText(user.getPhnum());
-                //after get user details only load department and line manager
-                loadDepartment();
+            user = documentSnapshot.toObject(User.class);
+            inputEmail.setText(user.getEmail());
+            inputName.setText(user.getName());
+            inputPhnum.setText(user.getPhnum());
+            //after get user details only load department and line manager
+            loadDepartment();
             }
         });
     }
@@ -179,31 +179,31 @@ public class ProfileActivity extends AppCompatActivity {
         fireStore.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    for(QueryDocumentSnapshot document:task.getResult()){
-                        User u = document.toObject(User.class);
-                        for(String manager:managers){
-                            if(u.getId().equals(manager)){
-                                lineManagers.add(u);
-                                break;
-                            }
+            if(task.isSuccessful()){
+                for(QueryDocumentSnapshot document:task.getResult()){
+                    User u = document.toObject(User.class);
+                    for(String manager:managers){
+                        if(u.getId().equals(manager)){
+                            lineManagers.add(u);
+                            break;
                         }
                     }
-                    userAdapter.notifyDataSetChanged();
-
-                    if(lineManagers.isEmpty()){
-                        Toast.makeText(getApplicationContext(), "This department has no line manager yet.", Toast.LENGTH_SHORT).show();
-                    }else if(d.getId().equals(user.getDepartment())){
-                        //change the manager
-                        for (int i = 0; i < lineManagers.size(); i++) {
-                            if (lineManagers.get(i).getId().equals(user.getLineManager())) {
-                                managerSpinner.setSelection(i);
-                            }
-                        }
-                    }
-                }else{
-                    Toast.makeText(getApplicationContext(), "Something went wrong. No manager available. Please try again later." , Toast.LENGTH_SHORT).show();
                 }
+                userAdapter.notifyDataSetChanged();
+
+                if(lineManagers.isEmpty()){
+                    Toast.makeText(getApplicationContext(), "This department has no line manager yet.", Toast.LENGTH_SHORT).show();
+                }else if(d.getId().equals(user.getDepartment())){
+                    //change the manager
+                    for (int i = 0; i < lineManagers.size(); i++) {
+                        if (lineManagers.get(i).getId().equals(user.getLineManager())) {
+                            managerSpinner.setSelection(i);
+                        }
+                    }
+                }
+            }else{
+                Toast.makeText(getApplicationContext(), "Something went wrong. No manager available. Please try again later." , Toast.LENGTH_SHORT).show();
+            }
             }
         });
     }

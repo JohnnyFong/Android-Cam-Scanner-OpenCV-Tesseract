@@ -140,23 +140,23 @@ public class RegisterActivity extends AppCompatActivity {
         fireStore.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    for(QueryDocumentSnapshot document:task.getResult()){
-                        User u = document.toObject(User.class);
-                        for(String manager:managers){
-                            if(u.getId().equals(manager)){
-                                lineManagers.add(u);
-                                break;
-                            }
+            if(task.isSuccessful()){
+                for(QueryDocumentSnapshot document:task.getResult()){
+                    User u = document.toObject(User.class);
+                    for(String manager:managers){
+                        if(u.getId().equals(manager)){
+                            lineManagers.add(u);
+                            break;
                         }
                     }
-                    userAdapter.notifyDataSetChanged();
-                    if(lineManagers.isEmpty()){
-                        Toast.makeText(getApplicationContext(), "This department has no line manager yet.", Toast.LENGTH_SHORT).show();
-                    }
-                }else{
-                    Toast.makeText(getApplicationContext(), "Something went wrong. No manager available. Please try again later." , Toast.LENGTH_SHORT).show();
                 }
+                userAdapter.notifyDataSetChanged();
+                if(lineManagers.isEmpty()){
+                    Toast.makeText(getApplicationContext(), "This department has no line manager yet.", Toast.LENGTH_SHORT).show();
+                }
+            }else{
+                Toast.makeText(getApplicationContext(), "Something went wrong. No manager available. Please try again later." , Toast.LENGTH_SHORT).show();
+            }
             }
         });
     }

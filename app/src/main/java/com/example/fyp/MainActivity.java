@@ -19,10 +19,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.fyp.utils.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -31,6 +38,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     boolean doubleBack = false;
     AlertDialog.Builder builder;
     private FirebaseAuth fireAuth;
+    private FirebaseUser fireUser;
+    private FirebaseFirestore fireStore;
+    private User u;
+    private TextView title, subtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
         fireAuth = FirebaseAuth.getInstance();
+        fireStore = FirebaseFirestore.getInstance();
         builder = new AlertDialog.Builder(this);
 
 
@@ -61,10 +73,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ScanDocFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_scan);
+        title = navigationView.getHeaderView(0).findViewById(R.id.nav_title);
+        subtitle = navigationView.getHeaderView(0).findViewById(R.id.nav_subtitle);
+        fireUser = fireAuth.getCurrentUser();
+        if(fireUser!=null){
+            fireStore.collection("users").document(fireUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    u = documentSnapshot.toObject(User.class);
+                    title.setText(u.getName());
+                    subtitle.setText(u.getEmail());
+                }
+            });
         }
+
+
         navigationView.getHeaderView(0).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,8 +100,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FirebaseAuth.AuthStateListener authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user == null) {
+                fireUser = firebaseAuth.getCurrentUser();
+                if (fireUser == null) {
                     // user auth state is changed - user is null
                     // launch login activity
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -86,6 +109,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         };
+
+        if(savedInstanceState == null){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ScanDocFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_scan);
+        }
     }
 
     @Override
