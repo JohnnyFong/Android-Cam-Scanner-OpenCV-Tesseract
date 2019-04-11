@@ -24,17 +24,23 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 public class ExtractedInfoActivity extends AppCompatActivity {
 
     public static final String TESS_DATA = "/tessdata";
 
     OCRUtils OCR;
-    TextView resultView;
+    TextView resultView, price;
     Bitmap receiptBM;
     ImageView imageView;
     Bitmap bm;
     RelativeLayout progress;
+    String[] lines;
+    String[] words;
+    String P;
+    int index1, index2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +50,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         resultView = findViewById(R.id.resultView);
         progress = findViewById(R.id.loadingPanel);
+        price = findViewById(R.id.price);
 
         getTessData();
 
@@ -110,8 +117,31 @@ public class ExtractedInfoActivity extends AppCompatActivity {
 
                 temp = OCR.getOCRResult(bm);
 
+                //split the paragraph into lines
+                lines = temp.split("\n");
+
+                //for each line split the words
+                for (int j=0; j<lines.length; j++){
+                    words = lines[j].split("\\s+");
+                    for(String word:words){
+                        Log.d("OCR",word);
+                    }
+
+                    //for each word, find the word "total"
+                    for (int i=0; i<words.length; i++){
+
+                        //when total is found j is the line, i is the index of the word total
+                        if(words[i].toLowerCase().equals("total")){
+                            index1 = j;
+                            index2 = i;
+
+                            P = lines[j];// <--------- the total amount is in this line
+                        }
+                    }
+                }
+
             } catch (Exception ex) {
-                Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later...", Toast.LENGTH_SHORT).show();
+                return ex.toString();
             }
             return temp;
         }
@@ -125,6 +155,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
             progress.setVisibility(View.GONE);
             resultView.setText(foundString);
             imageView.setImageBitmap(bm);
+            price.setText(index1 + " " + index2 + " " +P);
         }
     }
 }
