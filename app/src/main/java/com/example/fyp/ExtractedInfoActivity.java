@@ -5,7 +5,9 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
     Bitmap receiptBM;
     ImageView imageView;
     Bitmap bm;
+    RelativeLayout progress;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +43,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         ImageConstant.selectedImageBitmap = null;
         imageView = findViewById(R.id.imageView);
         resultView = findViewById(R.id.resultView);
+        progress = findViewById(R.id.loadingPanel);
 
         getTessData();
 
@@ -100,7 +104,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
 
                 Imgproc.GaussianBlur(gray, gray, new Size(3, 3), 0);
 
-                Imgproc.threshold(gray, gray, 85, 255, Imgproc.THRESH_BINARY);
+                Imgproc.threshold(gray, gray, 0, 255, Imgproc.THRESH_OTSU + Imgproc.THRESH_BINARY_INV);
 
                 bm = BitmapUtils.matToBitmap(gray);
 
@@ -118,6 +122,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
             if (foundString == null) {
                 return;
             }
+            progress.setVisibility(View.GONE);
             resultView.setText(foundString);
             imageView.setImageBitmap(bm);
         }

@@ -1,135 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.widget.ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.widget.FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity"
-    android:id="@+id/profile_scroll">
+    tools:context=".ProfileActivity">
 
+    <!--Progress bar-->
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal" >
 
-        <LinearLayout
-            android:orientation="vertical"
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="56dp"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp">
-
-            <ImageView
-                android:id="@+id/profileImage"
-                android:layout_width="wrap_content"
-                android:layout_height="72dp"
-                android:layout_marginBottom="24dp"
-                android:layout_gravity="center_horizontal" />
-
-            <!--  Name Label -->
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-                <EditText android:id="@+id/input_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textCapWords"
-                    android:hint="Name" />
-            </android.support.design.widget.TextInputLayout>
-
-            <!-- Email Label -->
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-                <EditText android:id="@+id/input_email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:hint="Email" />
-            </android.support.design.widget.TextInputLayout>
-
-            <!-- Password Label -->
-            <!--<android.support.design.widget.TextInputLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="8dp"-->
-                <!--android:layout_marginBottom="8dp">-->
-                <!--<EditText android:id="@+id/input_password"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:inputType="textPassword"-->
-                    <!--android:hint="Password"/>-->
-            <!--</android.support.design.widget.TextInputLayout>-->
-
-            <!-- Phone number Label -->
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-
-                <EditText
-                    android:id="@+id/input_phnum"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Phone number"
-                    android:inputType="phone" />
-            </android.support.design.widget.TextInputLayout>
-
-            <TextView
-                android:id="@+id/department_textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Your Department"
-                android:textColor="?android:textColorHint"
-                android:paddingLeft="4dp"
-                android:paddingRight="4dp"
-                android:paddingBottom="7dp"
-                />
-            <android.support.v7.widget.AppCompatSpinner
-                android:id="@+id/department_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:spinnerMode="dialog"
-                android:background="@drawable/abc_edit_text_material"
-                style="@style/Widget.AppCompat.Spinner.Underlined" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/managerText"
-                android:text="Your Line Manager"
-                android:textColor="?android:textColorHint"
-                android:paddingLeft="4dp"
-                android:paddingRight="4dp"
-                android:paddingBottom="7dp" />
-            <android.support.v7.widget.AppCompatSpinner
-                android:id="@+id/manager_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:spinnerMode="dialog"
-                android:background="@drawable/abc_edit_text_material"
-                style="@style/Widget.AppCompat.Spinner.Underlined" />
-
-            <!-- Update Button -->
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/update_button"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
-                android:padding="12dp"
-                android:text="Update"/>
-
-
-
-        </LinearLayout>
-
-
+            android:indeterminate="true" />
 
     </RelativeLayout>
 
-</android.widget.ScrollView>
+    <!--profile-->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/profile_scroll">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp">
+
+                <ImageView
+                    android:id="@+id/profileImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="72dp"
+                    android:layout_marginBottom="24dp"
+                    android:layout_gravity="center_horizontal" />
+
+                <!--  Name Label -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp">
+                    <EditText android:id="@+id/input_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords"
+                        android:hint="Name" />
+                </android.support.design.widget.TextInputLayout>
+
+                <!-- Email Label -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp">
+                    <EditText android:id="@+id/input_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:hint="Email" />
+                </android.support.design.widget.TextInputLayout>
+
+                <!-- Phone number Label -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp">
+
+                    <EditText
+                        android:id="@+id/input_phnum"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Phone number"
+                        android:inputType="phone" />
+                </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/department_textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your Department"
+                    android:textColor="?android:textColorHint"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:paddingBottom="7dp"
+                    />
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/department_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:spinnerMode="dialog"
+                    android:background="@drawable/abc_edit_text_material"
+                    style="@style/Widget.AppCompat.Spinner.Underlined" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/managerText"
+                    android:text="Your Line Manager"
+                    android:textColor="?android:textColorHint"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:paddingBottom="7dp" />
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/manager_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:spinnerMode="dialog"
+                    android:background="@drawable/abc_edit_text_material"
+                    style="@style/Widget.AppCompat.Spinner.Underlined" />
+
+                <!-- Update Button -->
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/update_button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:padding="12dp"
+                    android:text="Update"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+    </ScrollView>
+
+</android.widget.FrameLayout>

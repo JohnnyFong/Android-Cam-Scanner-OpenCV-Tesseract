@@ -36,17 +36,17 @@ public class CroppedImageActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(selectedImageBM != null) {
 
-                    File photoFile = null;
-                    try {
-                        photoFile = ImageConstant.createImageFile();
-
-                    } catch (IOException ex) {
-                        Toast.makeText(getApplicationContext(), "Error.", Toast.LENGTH_LONG).show();
-                    }
-                    ImageConstant.addPic(selectedImageBM, photoFile);
-                    ImageConstant.galleryAddPic(photoFile.getAbsolutePath(), getApplicationContext());
-
-                    Toast.makeText(getApplicationContext(), "Image saved to device.", Toast.LENGTH_LONG).show();
+//                    File photoFile = null;
+//                    try {
+//                        photoFile = ImageConstant.createImageFile();
+//
+//                    } catch (IOException ex) {
+//                        Toast.makeText(getApplicationContext(), "Error.", Toast.LENGTH_LONG).show();
+//                    }
+//                    ImageConstant.addPic(selectedImageBM, photoFile);
+//                    ImageConstant.galleryAddPic(photoFile.getAbsolutePath(), getApplicationContext());
+//
+//                    Toast.makeText(getApplicationContext(), "Image saved to device.", Toast.LENGTH_LONG).show();
 
                     ImageConstant.selectedImageBitmap = selectedImageBM;
                     Intent intent = new Intent(getApplicationContext(), ExtractedInfoActivity.class);

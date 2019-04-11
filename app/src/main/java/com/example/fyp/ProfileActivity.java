@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -48,6 +49,8 @@ public class ProfileActivity extends AppCompatActivity {
     private String department;
     private String lineManager;
 
+    private RelativeLayout progress;
+
     ArrayAdapter<Department> departmentAdapter;
     ArrayAdapter<User> userAdapter;
     List<Department> departments = new ArrayList<>();
@@ -70,6 +73,8 @@ public class ProfileActivity extends AppCompatActivity {
         departmentSpiner = findViewById(R.id.department_spinner);
         managerSpinner = findViewById(R.id.manager_spinner);
 
+        progress = findViewById(R.id.loadingPanel);
+
         fireStore = FirebaseFirestore.getInstance();
         fireUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -85,6 +90,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void updateProfile(){
+        progress.setVisibility(View.VISIBLE);
         email = inputEmail.getText().toString().trim();
         name = inputName.getText().toString();
         phnum = inputPhnum.getText().toString();
@@ -97,6 +103,7 @@ public class ProfileActivity extends AppCompatActivity {
         fireStore.collection("users").document(fireUser.getUid()).set(updateUser).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                progress.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "User profile has been updated" , Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -170,6 +177,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void loadManager(final Department d) {
+        progress.setVisibility(View.VISIBLE);
         userAdapter = new ArrayAdapter<User>(this, android.R.layout.simple_spinner_item, lineManagers);
         userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         managerSpinner.setAdapter(userAdapter);
@@ -201,6 +209,7 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     }
                 }
+                progress.setVisibility(View.GONE);
             }else{
                 Toast.makeText(getApplicationContext(), "Something went wrong. No manager available. Please try again later." , Toast.LENGTH_SHORT).show();
             }

@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -48,6 +49,8 @@ public class RegisterActivity extends AppCompatActivity {
     private String department;
     private String lineManager;
 
+    private RelativeLayout progress;
+
     ArrayAdapter<Department> departmentAdapter;
     ArrayAdapter<User> userAdapter;
     List<Department> departments = new ArrayList<>();
@@ -72,6 +75,8 @@ public class RegisterActivity extends AppCompatActivity {
         departmentSpiner = findViewById(R.id.department_spinner);
         managerSpinner = findViewById(R.id.manager_spinner);
 
+        progress = findViewById(R.id.loadingPanel);
+
         //get firebase instance
         fireAuth = FirebaseAuth.getInstance();
         fireStore = FirebaseFirestore.getInstance();
@@ -93,6 +98,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void loadDepartment(){
+        progress.setVisibility(View.VISIBLE);
         departmentAdapter = new ArrayAdapter<Department>(this, android.R.layout.simple_spinner_item, departments);
         departmentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -131,6 +137,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void loadManager(Department d){
+        progress.setVisibility(View.VISIBLE);
         userAdapter = new ArrayAdapter<User>(this, android.R.layout.simple_spinner_item, lineManagers);
         userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         managerSpinner.setAdapter(userAdapter);
@@ -151,6 +158,7 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 }
                 userAdapter.notifyDataSetChanged();
+                progress.setVisibility(View.GONE);
                 if(lineManagers.isEmpty()){
                     Toast.makeText(getApplicationContext(), "This department has no line manager yet.", Toast.LENGTH_SHORT).show();
                 }
@@ -162,6 +170,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registerUser(){
+        progress.setVisibility(View.VISIBLE);
         email = inputEmail.getText().toString().trim();
         password = inputPassword.getText().toString().trim();
         name = inputName.getText().toString();
@@ -182,6 +191,7 @@ public class RegisterActivity extends AppCompatActivity {
                     fireStore.collection("users").document(fbUser.getUid()).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            progress.setVisibility(View.GONE);
                             Toast.makeText(getApplicationContext(), "User Created" , Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
                             startActivity(intent);
