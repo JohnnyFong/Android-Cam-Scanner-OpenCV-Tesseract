@@ -31,7 +31,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
     public static final String TESS_DATA = "/tessdata";
 
     OCRUtils OCR;
-    TextView resultView, price;
+    TextView resultView;
     Bitmap receiptBM;
     ImageView imageView;
     Bitmap bm;
@@ -50,7 +50,6 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         resultView = findViewById(R.id.resultView);
         progress = findViewById(R.id.loadingPanel);
-        price = findViewById(R.id.price);
 
         getTessData();
 
@@ -133,7 +132,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                         //when total is found j is the line, i is the index of the word total
                         if(words[i].toLowerCase().equals("total")){
                             index1 = j;
-                            index2 = i;
+                            index2 = i; //<------ total is at this index
 
                             P = lines[j];// <--------- the total amount is in this line
                         }
@@ -143,7 +142,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
             } catch (Exception ex) {
                 return ex.toString();
             }
-            return temp;
+            return P;
         }
 
 
@@ -155,7 +154,6 @@ public class ExtractedInfoActivity extends AppCompatActivity {
             progress.setVisibility(View.GONE);
             resultView.setText(foundString);
             imageView.setImageBitmap(bm);
-            price.setText(index1 + " " + index2 + " " +P);
         }
     }
 }
