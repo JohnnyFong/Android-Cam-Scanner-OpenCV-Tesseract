@@ -2,6 +2,7 @@ package com.example.fyp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -30,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseFirestore fireStore;
     private User u;
     private TextView title, subtitle;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fireStore = FirebaseFirestore.getInstance();
         builder = new AlertDialog.Builder(this);
 
+        sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -83,6 +87,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     u = documentSnapshot.toObject(User.class);
                     title.setText(u.getName());
                     subtitle.setText(u.getEmail());
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(u);
+                    editor.putString("CurrentUser", json);
+                    editor.apply();
                 }
             });
         }

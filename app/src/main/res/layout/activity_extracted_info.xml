@@ -40,11 +40,30 @@
                     android:layout_gravity="center_horizontal"
                     android:adjustViewBounds="true" />
 
-                <TextView
-                    android:id="@+id/resultView"
+                <!--  Name Label -->
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp" />
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp">
+
+                    <EditText
+                        android:id="@+id/input_price"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Total Price"
+                        android:inputType="textCapWords" />
+                </android.support.design.widget.TextInputLayout>
+
+                <!-- Continue Button -->
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_continue"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="24dp"
+                    android:padding="12dp"
+                    android:text="Continue" />
             </LinearLayout>
 
         </RelativeLayout>

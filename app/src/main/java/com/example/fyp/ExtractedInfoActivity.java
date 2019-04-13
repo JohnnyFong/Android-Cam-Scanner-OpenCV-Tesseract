@@ -1,19 +1,30 @@
 package com.example.fyp;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fyp.utils.BitmapUtils;
+import com.example.fyp.utils.Claim;
 import com.example.fyp.utils.ImageConstant;
 import com.example.fyp.utils.OCRUtils;
+import com.example.fyp.utils.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -31,15 +42,19 @@ public class ExtractedInfoActivity extends AppCompatActivity {
     public static final String TESS_DATA = "/tessdata";
 
     OCRUtils OCR;
-    TextView resultView;
     Bitmap receiptBM;
     ImageView imageView;
     Bitmap bm;
     RelativeLayout progress;
     String[] lines;
     String[] words;
-    String P;
+    EditText inputPrice;
+    ArrayList<String> price;
+    Boolean flag = true;
+    Button btnContinue;
     int index1, index2;
+    private SharedPreferences sharedPreferences;
+    private FirebaseFirestore fs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +63,19 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         receiptBM = ImageConstant.selectedImageBitmap;
         ImageConstant.selectedImageBitmap = null;
         imageView = findViewById(R.id.imageView);
-        resultView = findViewById(R.id.resultView);
         progress = findViewById(R.id.loadingPanel);
+        inputPrice = findViewById(R.id.input_price);
+        btnContinue = findViewById(R.id.btn_continue);
+
+        sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
+        fs = FirebaseFirestore.getInstance();
+
+        btnContinue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createClaim();
+            }
+        });
 
         getTessData();
 
@@ -59,6 +85,29 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         task.execute();
 
         //get the bitmap from ImageConstant and do OCR
+
+    }
+
+    private void createClaim(){
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("CurrentUser", null);
+        User u = gson.fromJson(json, User.class);
+
+        Claim claim = new Claim(u.getId(),"pending",Double.valueOf(price.toString()),u.getLineManager(),u.getDepartment());
+
+        fs.collection("claims").add(claim).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                Toast.makeText(getApplicationContext(), "Claim has been created.", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Claim has not been created.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
 
     }
 
@@ -91,9 +140,9 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         }
     }
 
-    private class AsyncOcrTask extends AsyncTask<Void, Void, String> {
+    private class AsyncOcrTask extends AsyncTask<Void, Void, ArrayList<String>> {
         @Override
-        protected String doInBackground(Void... voids) {
+        protected ArrayList<String> doInBackground(Void... voids) {
             String temp = "";
 
             try {
@@ -133,27 +182,33 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                         if(words[i].toLowerCase().equals("total")){
                             index1 = j;
                             index2 = i; //<------ total is at this index
-
-                            P = lines[j];// <--------- the total amount is in this line
+                            for(int k=i+1; k<words.length; k++){
+                                price.add(words[k]);
+                            }
+//                            price = words[i+1];// <--------- the total amount is in this line
                         }
+
                     }
                 }
 
+
+
             } catch (Exception ex) {
-                return ex.toString();
+                flag = false;
             }
-            return P;
+            return price;
         }
 
 
         @Override
-        protected void onPostExecute(String foundString) {
-            if (foundString == null) {
+        protected void onPostExecute(ArrayList<String> foundString) {
+            if (foundString == null || !flag) {
                 return;
             }
             progress.setVisibility(View.GONE);
-            resultView.setText(foundString);
             imageView.setImageBitmap(bm);
+            inputPrice.setText(foundString.toString());
+
         }
     }
 }
