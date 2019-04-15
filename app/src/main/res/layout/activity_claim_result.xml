@@ -4,35 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ExtractedInfoActivity">
+    tools:context=".ClaimResultActivity"
+    android:id="@+id/frameLayout">
 
-    <RelativeLayout
-        android:id="@+id/loadingPanel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal" >
-
-        <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
-    </RelativeLayout>
+    <!--profile-->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:paddingTop="10dp">
+                android:paddingRight="24dp">
+
                 <FrameLayout
                     android:layout_width="300dp"
                     android:layout_height="400dp"
@@ -52,37 +43,58 @@
                         android:adjustViewBounds="true" />
                 </FrameLayout>
 
-
-
-                <!--  Name Label -->
+                <!-- Amount Label -->
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp">
-
-                    <EditText
-                        android:id="@+id/input_price"
+                    <EditText android:id="@+id/input_amount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Total Price"
-                        android:text="Processing"
-                        android:inputType="textCapWords" />
+                        android:inputType="textCapWords"
+                        android:hint="Claim Amount" />
                 </android.support.design.widget.TextInputLayout>
 
-                <!-- Continue Button -->
+                <!-- Claim date -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp">
+                    <EditText android:id="@+id/input_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:hint="Claim Date" />
+                </android.support.design.widget.TextInputLayout>
+
+                <!--&lt;!&ndash; manager label&ndash;&gt;-->
+                <!--<android.support.design.widget.TextInputLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="8dp"-->
+                    <!--android:layout_marginBottom="8dp">-->
+                    <!--<EditText android:id="@+id/input_manager"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:inputType="textEmailAddress"-->
+                        <!--android:hint="Claim Submitted To" />-->
+                <!--</android.support.design.widget.TextInputLayout>-->
+
+                <!--ok button-->
                 <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/btn_continue"
+                    android:id="@+id/btn_ok"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:layout_marginBottom="24dp"
                     android:padding="12dp"
-                    android:text="Create Claim" />
+                    android:text="OK" />
             </LinearLayout>
 
         </RelativeLayout>
-
     </ScrollView>
+
 
 </android.widget.FrameLayout>

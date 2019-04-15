@@ -54,7 +54,8 @@ public class ExtractedInfoActivity extends AppCompatActivity {
     String price;
     Boolean flag = true;
     Button btnContinue;
-    int index1, index2;
+    Claim claim;
+
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore fs;
 
@@ -74,7 +75,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         imageView.setImageBitmap(receiptBM);
         sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
         fs = FirebaseFirestore.getInstance();
-
+        btnContinue.setEnabled(false);
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,19 +97,20 @@ public class ExtractedInfoActivity extends AppCompatActivity {
             String json = sharedPreferences.getString("CurrentUser", null);
             User u = gson.fromJson(json, User.class);
 
-            Claim claim = new Claim(u.getId(),"pending",Double.valueOf(price),u.getLineManager(),u.getDepartment(), Calendar.getInstance().getTime());
+            claim = new Claim(u.getId(),"pending",Double.valueOf(price),u.getLineManager(),u.getDepartment(), Calendar.getInstance().getTime());
 
             fs.collection("claims").add(claim).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
-                    Toast.makeText(getApplicationContext(), "Claim has been created.", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                    ImageConstant.selectedImageBitmap = receiptBM;
+                    Intent intent = new Intent(getApplicationContext(),ClaimResultActivity.class);
+                    intent.putExtra("claimObj",claim);
                     startActivity(intent);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getApplicationContext(), "Claim has not been created.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Claim has not been created. Please check your connection.", Toast.LENGTH_SHORT).show();
                 }
             });
         }else{
@@ -209,6 +211,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         protected void onPostExecute(String foundString) {
             progress.setVisibility(View.GONE);
             inputPrice.setFocusableInTouchMode(true);
+            btnContinue.setEnabled(true);
             inputPrice.setEnabled(true);
             if (foundString == null || !flag) {
                 Toast.makeText(getApplicationContext(),"Unable to identify total, Please ensure that the picture is clear and it is a valid receipt and try again.",Toast.LENGTH_LONG).show();

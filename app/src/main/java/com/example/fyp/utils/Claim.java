@@ -1,8 +1,9 @@
 package com.example.fyp.utils;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Claim {
+public class Claim implements Serializable {
     private String userID;
     private String status;
     private double amount;
