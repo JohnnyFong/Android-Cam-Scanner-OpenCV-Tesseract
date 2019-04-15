@@ -6,6 +6,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,9 @@ import android.widget.TextView;
 
 import com.example.fyp.utils.Claim;
 import com.example.fyp.utils.ImageConstant;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class ClaimResultActivity extends AppCompatActivity {
 
@@ -48,9 +52,13 @@ public class ClaimResultActivity extends AppCompatActivity {
 
         claim = (Claim) getIntent().getSerializableExtra("claimObj");
 
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(claim.getDate());
+        String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
+
         inputAmount.setText(String.valueOf(claim.getAmount()));
         inputAmount.setFocusable(false);
-        inputDate.setText(claim.getDate().toString());
+        inputDate.setText(date);
         inputDate.setFocusable(false);
 
         btnOk = findViewById(R.id.btn_ok);
