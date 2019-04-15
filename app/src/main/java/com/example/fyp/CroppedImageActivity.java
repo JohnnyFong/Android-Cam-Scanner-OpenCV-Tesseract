@@ -51,7 +51,6 @@ public class CroppedImageActivity extends AppCompatActivity {
                     ImageConstant.selectedImageBitmap = selectedImageBM;
                     Intent intent = new Intent(getApplicationContext(), ExtractedInfoActivity.class);
                     startActivity(intent);
-
                 }
 
             }

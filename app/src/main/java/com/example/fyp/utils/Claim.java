@@ -1,18 +1,30 @@
 package com.example.fyp.utils;
 
+import java.util.Date;
+
 public class Claim {
     private String userID;
     private String status;
     private double amount;
     private String managerID;
     private String department;
+    private Date date;
 
-    public Claim(String userID, String status, double amount, String managerID, String department) {
+    public Claim(String userID, String status, double amount, String managerID, String department, Date date) {
         this.userID = userID;
         this.status = status;
         this.amount = amount;
         this.managerID = managerID;
         this.department = department;
+        this.date = date;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public String getUserID() {

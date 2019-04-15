@@ -1,5 +1,6 @@
 package com.example.fyp;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -36,11 +37,12 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ExtractedInfoActivity extends AppCompatActivity {
 
     public static final String TESS_DATA = "/tessdata";
-
+    final String regExp = "[0-9]+([,.][0-9]{1,2})?";
     OCRUtils OCR;
     Bitmap receiptBM;
     ImageView imageView;
@@ -49,7 +51,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
     String[] lines;
     String[] words;
     EditText inputPrice;
-    ArrayList<String> price;
+    String price;
     Boolean flag = true;
     Button btnContinue;
     int index1, index2;
@@ -63,10 +65,13 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         receiptBM = ImageConstant.selectedImageBitmap;
         ImageConstant.selectedImageBitmap = null;
         imageView = findViewById(R.id.imageView);
+        imageView.requestFocus();
         progress = findViewById(R.id.loadingPanel);
         inputPrice = findViewById(R.id.input_price);
+        inputPrice.setEnabled(false);
+        inputPrice.setFocusable(false);
         btnContinue = findViewById(R.id.btn_continue);
-
+        imageView.setImageBitmap(receiptBM);
         sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
         fs = FirebaseFirestore.getInstance();
 
@@ -80,34 +85,36 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         getTessData();
 
         OCR = new OCRUtils(this);
-
+        //get the bitmap from ImageConstant and do OCR
         AsyncOcrTask task = new AsyncOcrTask();
         task.execute();
-
-        //get the bitmap from ImageConstant and do OCR
-
     }
 
     private void createClaim(){
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString("CurrentUser", null);
-        User u = gson.fromJson(json, User.class);
+        if(inputPrice.getText().toString().matches(regExp)){
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("CurrentUser", null);
+            User u = gson.fromJson(json, User.class);
 
-        Claim claim = new Claim(u.getId(),"pending",Double.valueOf(price.toString()),u.getLineManager(),u.getDepartment());
+            Claim claim = new Claim(u.getId(),"pending",Double.valueOf(price),u.getLineManager(),u.getDepartment(), Calendar.getInstance().getTime());
 
-        fs.collection("claims").add(claim).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Toast.makeText(getApplicationContext(), "Claim has been created.", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Claim has not been created.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
+            fs.collection("claims").add(claim).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    Toast.makeText(getApplicationContext(), "Claim has been created.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(), "Claim has not been created.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            Toast.makeText(getApplicationContext(),"The price is wrong format, make sure to not include any characters.",Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -140,11 +147,12 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         }
     }
 
-    private class AsyncOcrTask extends AsyncTask<Void, Void, ArrayList<String>> {
+    private class AsyncOcrTask extends AsyncTask<Void, Void, String> {
         @Override
-        protected ArrayList<String> doInBackground(Void... voids) {
-            String temp = "";
-
+        protected String doInBackground(Void... voids) {
+            String temp;
+            Boolean cnt;
+            String p = null;
             try {
                 //change bitmap to map
                 Mat gray = new Mat();
@@ -174,40 +182,42 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                     for(String word:words){
                         Log.d("OCR",word);
                     }
-
+                    cnt = false;
                     //for each word, find the word "total"
                     for (int i=0; i<words.length; i++){
 
-                        //when total is found j is the line, i is the index of the word total
-                        if(words[i].toLowerCase().equals("total")){
-                            index1 = j;
-                            index2 = i; //<------ total is at this index
-                            for(int k=i+1; k<words.length; k++){
-                                price.add(words[k]);
+                        if(cnt){
+                            //extract the number from the line.
+                            if(words[i].matches(regExp)){
+                                p=words[i];
                             }
-//                            price = words[i+1];// <--------- the total amount is in this line
+                        }else if(words[i].toLowerCase().equals("total")){//when total is found j is the line, i is the index of the word total
+                            cnt = true;//found the total, put the remainding string into this price variable
                         }
 
                     }
                 }
 
-
-
             } catch (Exception ex) {
+                Log.d("OCR", ex.toString());
                 flag = false;
             }
-            return price;
+            return p;
         }
 
 
         @Override
-        protected void onPostExecute(ArrayList<String> foundString) {
+        protected void onPostExecute(String foundString) {
+            progress.setVisibility(View.GONE);
+            inputPrice.setFocusableInTouchMode(true);
+            inputPrice.setEnabled(true);
             if (foundString == null || !flag) {
+                Toast.makeText(getApplicationContext(),"Unable to identify total, Please ensure that the picture is clear and it is a valid receipt and try again.",Toast.LENGTH_LONG).show();
                 return;
             }
-            progress.setVisibility(View.GONE);
-            imageView.setImageBitmap(bm);
-            inputPrice.setText(foundString.toString());
+
+            inputPrice.setText(foundString);
+            price = foundString;
 
         }
     }
