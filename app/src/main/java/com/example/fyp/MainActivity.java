@@ -186,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 fireAuth.signOut();
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.clear();
                                 Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
                                 startActivity(intent);
                                 finish();

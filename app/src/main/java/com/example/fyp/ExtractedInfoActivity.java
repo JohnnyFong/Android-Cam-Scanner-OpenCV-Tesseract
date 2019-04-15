@@ -103,7 +103,6 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                 public void onSuccess(DocumentReference documentReference) {
                     Toast.makeText(getApplicationContext(), "Claim has been created.", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 }
             }).addOnFailureListener(new OnFailureListener() {

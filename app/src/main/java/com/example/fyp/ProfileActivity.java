@@ -1,6 +1,7 @@
 package com.example.fyp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +51,9 @@ public class ProfileActivity extends AppCompatActivity {
     private String department;
     private String lineManager;
 
+    private SharedPreferences sharedPreferences;
     private RelativeLayout progress;
+    private User updateUser;
 
     ArrayAdapter<Department> departmentAdapter;
     ArrayAdapter<User> userAdapter;
@@ -75,6 +79,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         progress = findViewById(R.id.loadingPanel);
 
+        sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
+
         fireStore = FirebaseFirestore.getInstance();
         fireUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -99,10 +105,16 @@ public class ProfileActivity extends AppCompatActivity {
         User u = (User) managerSpinner.getSelectedItem();
         lineManager = u.getId();
 
-        User updateUser = new User(fireUser.getUid(),name,email,phnum,department,lineManager);
+        updateUser = new User(fireUser.getUid(),name,email,phnum,department,lineManager);
+
         fireStore.collection("users").document(fireUser.getUid()).set(updateUser).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                Gson gson = new Gson();
+                String json = gson.toJson(updateUser);
+                editor.putString("CurrentUser", json);
+                editor.apply();
                 progress.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "User profile has been updated" , Toast.LENGTH_SHORT).show();
             }
