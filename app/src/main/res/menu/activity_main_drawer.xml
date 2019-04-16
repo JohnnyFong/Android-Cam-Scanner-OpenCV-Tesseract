@@ -3,39 +3,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_scan"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Scan Document" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
-        <item
-            android:id="@+id/nav_signOut"
-            android:icon="@drawable/ic_exit_to_app_black_24dp"
-            android:title="Sign Out" />
-    </group>
+
+        <item android:title="EzClaim">
+            <menu>
+                <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_dashboard"
+                    android:icon="@drawable/ic_dvr_black_24dp"
+                    android:title="Dashboard" />
+                <item
+                    android:id="@+id/nav_myClaims"
+                    android:icon="@drawable/ic_menu_gallery"
+                    android:title="My Claims" />
+                <item
+                    android:id="@+id/nav_subClaims"
+                    android:icon="@drawable/ic_menu_slideshow"
+                    android:title="Subordinate Claims" />
+                </group>
+            </menu>
+        </item>
+
+
+
+
 
     <item android:title="Communicate">
         <menu>
+            <!--<item-->
+                <!--android:id="@+id/nav_share"-->
+                <!--android:icon="@drawable/ic_menu_share"-->
+                <!--android:title="Share" />-->
+            <!--<item-->
+                <!--android:id="@+id/nav_send"-->
+                <!--android:icon="@drawable/ic_menu_send"-->
+                <!--android:title="Send" />-->
+
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:id="@+id/nav_signOut"
+                android:icon="@drawable/ic_exit_to_app_black_24dp"
+                android:title="Sign Out" />
         </menu>
     </item>
 

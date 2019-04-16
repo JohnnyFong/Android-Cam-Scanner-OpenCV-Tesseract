@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -29,6 +31,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -41,6 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView loginText;
     private Spinner departmentSpiner, managerSpinner;
     private User user;
+    private ImageView imageView;
 
     private String email;
     private String password;
@@ -74,6 +78,8 @@ public class RegisterActivity extends AppCompatActivity {
         loginText = findViewById(R.id.link_login);
         departmentSpiner = findViewById(R.id.department_spinner);
         managerSpinner = findViewById(R.id.manager_spinner);
+        imageView = findViewById(R.id.logo);
+        imageView.requestFocus();
 
         progress = findViewById(R.id.loadingPanel);
 
@@ -171,6 +177,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void registerUser(){
         progress.setVisibility(View.VISIBLE);
+
+        boolean flag = true;
+
         email = inputEmail.getText().toString().trim();
         password = inputPassword.getText().toString().trim();
         name = inputName.getText().toString();
@@ -180,35 +189,67 @@ public class RegisterActivity extends AppCompatActivity {
         User u = (User) managerSpinner.getSelectedItem();
         lineManager = u.getId();
 
-        fireAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    //login successful add profile logic needed.
-                    FirebaseUser fbUser = fireAuth.getCurrentUser();
-                    user = new User(fbUser.getUid(),name,email,phnum,department,lineManager);
 
-                    fireStore.collection("users").document(fbUser.getUid()).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            progress.setVisibility(View.GONE);
-                            Toast.makeText(getApplicationContext(), "User Created" , Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getApplicationContext(), "Something went wrong. User not created. Please try again later." , Toast.LENGTH_SHORT).show();
+        if(email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            inputEmail.setError("Please enter a valid Email.");
+            flag = false;
+        }else{
+            inputEmail.setError(null);
+        }
 
-                        }
-                    });
-                }else{
-                    Toast.makeText(getApplicationContext(), "Register failed." + task.getException(), Toast.LENGTH_SHORT).show();
+        if(password.isEmpty()){
+            inputPassword.setError("Please enter your password.");
+            flag = false;
+        }else{
+            inputPassword.setError(null);
+        }
+
+        if(name.isEmpty()){
+            inputName.setError("Please enter your name.");
+            flag = false;
+        }else{
+            inputName.setError(null);
+        }
+
+        if(phnum.isEmpty() || !Patterns.PHONE.matcher(phnum).matches()){
+            inputPhnum.setError("Please enter a valid phone number.");
+            flag = false;
+        }else{
+            inputPhnum.setError(null);
+        }
+
+        if(flag){
+            fireAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()){
+                        //login successful add profile logic needed.
+                        FirebaseUser fbUser = fireAuth.getCurrentUser();
+                        user = new User(fbUser.getUid(),name,email,phnum,department,lineManager);
+
+                        fireStore.collection("users").document(fbUser.getUid()).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                progress.setVisibility(View.GONE);
+                                Toast.makeText(getApplicationContext(), "User Created" , Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getApplicationContext(), "Something went wrong. User not created. Please try again later." , Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                    }else{
+                        Toast.makeText(getApplicationContext(), "Register failed." + task.getException(), Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
-
+            });
+        }else{
+            progress.setVisibility(View.GONE);
+        }
     }
 }

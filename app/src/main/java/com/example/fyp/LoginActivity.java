@@ -1,5 +1,6 @@
 package com.example.fyp;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;;
@@ -73,22 +74,36 @@ public class LoginActivity extends AppCompatActivity  {
 
     private void attemptLogin() {
 
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this, R.style.Theme_AppCompat_DayNight_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Authenticating...");
+        progressDialog.show();
+
         String email = inputEmail.getText().toString();
         String password = inputPassword.getText().toString();
 
-        fireAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    Intent MainIntent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(MainIntent);
-                    finish();
-                    Toast.makeText(LoginActivity.this,"Signed in", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Invalid Email or Password. Please try again later." , Toast.LENGTH_SHORT).show();
+        try {
+
+            fireAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        progressDialog.dismiss();
+                        Intent MainIntent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(MainIntent);
+                        finish();
+                        Toast.makeText(LoginActivity.this, "Signed in", Toast.LENGTH_SHORT).show();
+                    } else {
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "Invalid Email or Password. Please try again later.", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
+        catch(Exception ex){
+            progressDialog.dismiss();
+            Toast.makeText(getApplicationContext(),"Please make sure the Email and Password are keyed in.",Toast.LENGTH_LONG).show();
+        }
 
     }
 

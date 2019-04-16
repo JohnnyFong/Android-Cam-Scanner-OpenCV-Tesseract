@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(savedInstanceState == null){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ScanDocFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_scan);
+            navigationView.setCheckedItem(R.id.nav_dashboard);
         }
     }
 
@@ -162,24 +162,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
 
         switch(item.getItemId()) {
-            case R.id.nav_scan:
+            case R.id.nav_dashboard:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ScanDocFragment()).commit();
                 break;
-            case R.id.nav_gallery:
+            case R.id.nav_myClaims:
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
                 break;
-            case R.id.nav_slideshow:
+            case R.id.nav_subClaims:
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
                 break;
-            case R.id.nav_manage:
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
-                break;
-            case R.id.nav_share:
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
-                break;
-            case R.id.nav_send:
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
-                break;
+//            case R.id.nav_share:
+//                //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
+//                break;
+//            case R.id.nav_send:
+//                //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
+//                break;
             case R.id.nav_signOut:
                 builder.setMessage("Are you sure to Sign Out?")
                         .setCancelable(false)
