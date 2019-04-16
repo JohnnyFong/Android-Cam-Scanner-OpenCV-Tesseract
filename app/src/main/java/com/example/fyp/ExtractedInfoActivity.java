@@ -25,6 +25,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
 import org.opencv.core.Mat;
@@ -32,12 +35,14 @@ import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class ExtractedInfoActivity extends AppCompatActivity {
 
@@ -58,6 +63,8 @@ public class ExtractedInfoActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore fs;
+    private FirebaseStorage firebaseStorage;
+    private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +82,8 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         imageView.setImageBitmap(receiptBM);
         sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
         fs = FirebaseFirestore.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+        storageReference = firebaseStorage.getReference();
         btnContinue.setEnabled(false);
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,26 +102,49 @@ public class ExtractedInfoActivity extends AppCompatActivity {
 
     private void createClaim(){
         if(inputPrice.getText().toString().matches(regExp)){
+            progress.setVisibility(View.VISIBLE);
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            receiptBM.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+            byte[] data = byteArrayOutputStream.toByteArray();
+
+            Date date = Calendar.getInstance().getTime();
+            StorageReference ref = storageReference.child("receipts/"+date.toString()+".jpg");
+
             Gson gson = new Gson();
             String json = sharedPreferences.getString("CurrentUser", null);
             User u = gson.fromJson(json, User.class);
+            claim = new Claim(u.getId(),"pending",Double.valueOf(price),u.getLineManager(),u.getDepartment(), date, date.toString()+".jpg");
 
-            claim = new Claim(u.getId(),"pending",Double.valueOf(price),u.getLineManager(),u.getDepartment(), Calendar.getInstance().getTime());
-
-            fs.collection("claims").add(claim).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            UploadTask uploadTask = ref.putBytes(data);
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onSuccess(DocumentReference documentReference) {
-                    ImageConstant.selectedImageBitmap = receiptBM;
-                    Intent intent = new Intent(getApplicationContext(),ClaimResultActivity.class);
-                    intent.putExtra("claimObj",claim);
-                    startActivity(intent);
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    fs.collection("claims").add(claim).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            ImageConstant.selectedImageBitmap = receiptBM;
+                            Intent intent = new Intent(getApplicationContext(),ClaimResultActivity.class);
+                            intent.putExtra("claimObj",claim);
+                            startActivity(intent);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getApplicationContext(), "Claim has not been created. Please check your connection.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getApplicationContext(), "Claim has not been created. Please check your connection.", Toast.LENGTH_SHORT).show();
+                    progress.setVisibility(View.GONE);
+                    Toast.makeText(getApplicationContext(),"Image upload failed, please try again with stable network.",Toast.LENGTH_LONG).show();
                 }
             });
+
         }else{
             Toast.makeText(getApplicationContext(),"The price is wrong format, make sure to not include any characters.",Toast.LENGTH_LONG).show();
         }

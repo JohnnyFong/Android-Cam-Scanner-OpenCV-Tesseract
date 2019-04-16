@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import com.example.fyp.utils.Claim;
 import com.example.fyp.utils.ImageConstant;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -47,14 +49,12 @@ public class ClaimResultActivity extends AppCompatActivity {
         inputDate = findViewById(R.id.input_date);
         imageView = findViewById(R.id.imageView);
         imageView.setImageBitmap(receiptBM);
-        imageView.requestFocus();
-
 
         claim = (Claim) getIntent().getSerializableExtra("claimObj");
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(claim.getDate());
-        String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
+        String date = DateFormat.format("dd-MM-yyyy HH:mm:ss", cal).toString();
 
         inputAmount.setText(String.valueOf(claim.getAmount()));
         inputAmount.setFocusable(false);

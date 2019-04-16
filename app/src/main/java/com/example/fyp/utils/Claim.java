@@ -10,14 +10,24 @@ public class Claim implements Serializable {
     private String managerID;
     private String department;
     private Date date;
+    private String photoPath;
 
-    public Claim(String userID, String status, double amount, String managerID, String department, Date date) {
+    public Claim(String userID, String status, double amount, String managerID, String department, Date date, String photoPath) {
         this.userID = userID;
         this.status = status;
         this.amount = amount;
         this.managerID = managerID;
         this.department = department;
         this.date = date;
+        this.photoPath = photoPath;
+    }
+
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
     }
 
     public Date getDate() {
