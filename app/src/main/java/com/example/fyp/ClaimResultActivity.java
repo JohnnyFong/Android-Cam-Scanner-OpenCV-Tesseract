@@ -54,7 +54,7 @@ public class ClaimResultActivity extends AppCompatActivity {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(claim.getDate());
-        String date = DateFormat.format("dd-MM-yyyy HH:mm:ss", cal).toString();
+        String date = DateFormat.format("dd-MM-yyyy HH:mm", cal).toString();
 
         inputAmount.setText(String.valueOf(claim.getAmount()));
         inputAmount.setFocusable(false);

@@ -1,5 +1,6 @@
 package com.example.fyp.utils;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -9,8 +10,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.fyp.R;
+import com.example.fyp.ViewMyClaimActivity;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -58,13 +61,27 @@ public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public class ItemViewHolder extends RecyclerView.ViewHolder{
         public TextView date, amount, status;
+        public Claim claim;
 
         public ItemViewHolder(View view){
             super(view);
             date = view.findViewById(R.id.date);
             amount = view.findViewById(R.id.amount);
             status = view.findViewById(R.id.status);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(view.getContext(), ViewMyClaimActivity.class);
+                    intent.putExtra("claimObj",claim);
+                    view.getContext().startActivity(intent);
+                }
+            });
         }
+        public void setClaim(Claim claim){
+            this.claim = claim;
+        }
+
     }
 
     private class LoadingViewHolder extends RecyclerView.ViewHolder {
@@ -91,6 +108,7 @@ public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.date.setText(date);
         viewHolder.amount.setText("RM" +String.valueOf(claim.getAmount()));
         viewHolder.status.setText(claim.getStatus());
+        viewHolder.setClaim(claim);
     }
 
 

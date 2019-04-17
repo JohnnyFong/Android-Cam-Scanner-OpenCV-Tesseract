@@ -36,7 +36,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ClaimResultActivity"></activity>
+        <activity android:name=".ViewMyClaimActivity"></activity>
+        <activity android:name=".ClaimResultActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".ExtractedInfoActivity" />
