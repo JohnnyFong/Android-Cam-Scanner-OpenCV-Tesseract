@@ -12,6 +12,8 @@ public class Claim implements Serializable {
     private Date date;
     private String photoPath;
 
+    public Claim(){}
+
     public Claim(String userID, String status, double amount, String managerID, String department, Date date, String photoPath) {
         this.userID = userID;
         this.status = status;
