@@ -9,10 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.example.fyp.utils.Claim;
 import com.example.fyp.utils.ClaimAdapter;
@@ -38,6 +41,9 @@ public class MyClaimFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore firestore;
     private DocumentSnapshot lastResult;
+    private boolean isLoading = false;
+    private User u;
+    private RelativeLayout progress;
 
     @Nullable
     @Override
@@ -45,9 +51,9 @@ public class MyClaimFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_my_claim, container, false);
 
-//        initScrollListener();
         recyclerView = view.findViewById(R.id.recycler_view);
 
+        progress = view.findViewById(R.id.loadingPanel);
         claimAdapter = new ClaimAdapter(claimList);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -59,20 +65,18 @@ public class MyClaimFragment extends Fragment {
         Gson gson = new Gson();
         sharedPreferences = this.getActivity().getSharedPreferences("sharePreferences",MODE_PRIVATE);
         String json = sharedPreferences.getString("CurrentUser", null);
-        User u = gson.fromJson(json, User.class);
+        u = gson.fromJson(json, User.class);
 
         loadClaim(u.getId());
+        initScrollListener();
 
         return view;
     }
 
-    private void loadClaim(String uID){
-        Query query;
-        if(lastResult == null){
-            query = firestore.collection("claims").orderBy("date", Query.Direction.ASCENDING).limit(3);
-        }else{
-            query = firestore.collection("claims").orderBy("date", Query.Direction.ASCENDING).startAfter(lastResult).limit(3);
-        }
+    public void loadClaim(String uID){
+        progress.setVisibility(View.VISIBLE);
+        Log.d("uid",uID);
+        Query query = firestore.collection("claims").whereEqualTo("userID", uID).orderBy("date", Query.Direction.ASCENDING).limit(10);
 
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -86,27 +90,66 @@ public class MyClaimFragment extends Fragment {
                 if(queryDocumentSnapshots.size() > 0) {
                     lastResult = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
                 }
+                progress.setVisibility(View.GONE);
             }
         });
 
     }
 
-//    private void initScrollListener(){
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//            }
-//
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-//
-//                if(!)
-//            }
-//        });
-//    }
+    private void loadMore(String uID){
+        claimList.add(null);
+
+
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                claimAdapter.notifyItemInserted(claimList.size() - 1);
+                Query query = firestore.collection("claims").whereEqualTo("userID", u.getId()).orderBy("date", Query.Direction.ASCENDING).startAfter(lastResult).limit(5);
+                query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        claimList.remove(claimList.size() - 1);
+                        int scrollPosition = claimList.size();
+                        claimAdapter.notifyItemRemoved(scrollPosition);
+
+                        for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                            Claim claim = documentSnapshot.toObject(Claim.class);
+                            claimList.add(claim);
+                        }
+                        //get the last document of the snapshot
+                        claimAdapter.notifyDataSetChanged();
+                        if(queryDocumentSnapshots.size() > 0) {
+                            lastResult = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                        }
+                        isLoading = false;
+                    }
+                });
+            }
+        });
+
+    }
+
+    public void initScrollListener(){
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+                if(!isLoading){
+                    if(linearLayoutManager !=null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == claimList.size() -1){
+                        loadMore(u.getId());
+                        isLoading = true;
+                    }
+                }
+            }
+        });
+    }
 
 }

@@ -114,7 +114,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("CurrentUser", null);
             User u = gson.fromJson(json, User.class);
-            claim = new Claim(u.getId(),"pending",Double.valueOf(price),u.getLineManager(),u.getDepartment(), date, date.toString()+".jpg");
+            claim = new Claim(u.getId(),"pending",Double.valueOf(inputPrice.getText().toString()),u.getLineManager(),u.getDepartment(), date, date.toString()+".jpg");
 
             UploadTask uploadTask = ref.putBytes(data);
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -246,6 +246,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
             btnContinue.setEnabled(true);
             inputPrice.setEnabled(true);
             if (foundString == null || !flag) {
+                inputPrice.setText(null);
                 Toast.makeText(getApplicationContext(),"Unable to identify total, Please ensure that the picture is clear and it is a valid receipt and try again.",Toast.LENGTH_LONG).show();
                 return;
             }
