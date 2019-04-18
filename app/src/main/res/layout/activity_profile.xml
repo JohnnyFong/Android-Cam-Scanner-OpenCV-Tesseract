@@ -125,10 +125,17 @@
                     android:id="@+id/update_button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginTop="10dp"
                     android:padding="12dp"
                     android:text="Update"/>
+
+                <!-- Update Button -->
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/reset_button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp"
+                    android:text="Reset Password"/>
 
             </LinearLayout>
 

@@ -35,10 +35,11 @@ import java.util.List;
 public class ProfileActivity extends AppCompatActivity {
     private FirebaseUser fireUser;
     private FirebaseFirestore fireStore;
+    private FirebaseAuth auth;
 
     private ScrollView profileScroll;
     private EditText inputEmail, inputName, inputPhnum;
-    private Button btnUpdate;
+    private Button btnUpdate, btnReset;
     private Spinner departmentSpiner, managerSpinner;
 
     private User user;
@@ -71,6 +72,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileScroll.setHorizontalScrollBarEnabled(false);
 
         btnUpdate = findViewById(R.id.update_button);
+        btnReset = findViewById(R.id.reset_button);
         inputEmail = findViewById(R.id.input_email);
         inputPhnum = findViewById(R.id.input_phnum);
         inputName = findViewById(R.id.input_name);
@@ -92,7 +94,35 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetPassword();
+            }
+        });
+
         loadProfile();
+    }
+
+    private void resetPassword(){
+        auth = FirebaseAuth.getInstance();
+
+        auth.sendPasswordResetEmail(user.getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "A password reset email has been sent to "+user.getEmail()+ ". Please log in again with the new password.",Toast.LENGTH_LONG).show();
+                    auth.signOut();
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.clear();
+                    Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Unable to reset password. Please make sure the email is valid and the network connection are stable.",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     private void updateProfile(){
