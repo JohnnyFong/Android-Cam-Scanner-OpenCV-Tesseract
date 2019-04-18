@@ -1,7 +1,8 @@
 package com.example.fyp;
 
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -15,6 +16,7 @@ import android.widget.RelativeLayout;
 
 import com.example.fyp.utils.Claim;
 import com.example.fyp.utils.ClaimAdapter;
+import com.example.fyp.utils.SubClaimAdapter;
 import com.example.fyp.utils.User;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,32 +31,30 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class MyClaimFragment extends Fragment {
+public class SubClaimFragment extends Fragment {
 
     private List<Claim> claimList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private ClaimAdapter claimAdapter;
+    private SubClaimAdapter subClaimAdapter;
+    private RelativeLayout progress;
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore firestore;
     private DocumentSnapshot lastResult;
     private boolean isLoading = false;
     private User u;
-    private RelativeLayout progress;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable  ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_my_claim, container, false);
-
-        recyclerView = view.findViewById(R.id.recycler_view);
+        View view = inflater.inflate(R.layout.fragment_sub_claim, container, false);
 
         progress = view.findViewById(R.id.loadingPanel);
-        claimAdapter = new ClaimAdapter(claimList);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        subClaimAdapter = new SubClaimAdapter(claimList);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(claimAdapter);
+        recyclerView.setAdapter(subClaimAdapter);
 
         firestore = FirebaseFirestore.getInstance();
 
@@ -72,7 +72,7 @@ public class MyClaimFragment extends Fragment {
     public void loadClaim(String uID){
         progress.setVisibility(View.VISIBLE);
         Log.d("uid",uID);
-        Query query = firestore.collection("claims").whereEqualTo("userID", uID).orderBy("date", Query.Direction.DESCENDING).limit(10);
+        Query query = firestore.collection("claims").whereEqualTo("managerID", uID).orderBy("date", Query.Direction.DESCENDING).limit(10);
 
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -82,7 +82,7 @@ public class MyClaimFragment extends Fragment {
                     claimList.add(claim);
                 }
                 //get the last document of the snapshot
-                claimAdapter.notifyDataSetChanged();
+                subClaimAdapter.notifyDataSetChanged();
                 if(queryDocumentSnapshots.size() > 0) {
                     lastResult = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
                 }
@@ -91,7 +91,6 @@ public class MyClaimFragment extends Fragment {
                 if(claimList.size()<10){
                     isLoading = true;
                 }
-
             }
         });
 
@@ -104,21 +103,21 @@ public class MyClaimFragment extends Fragment {
         recyclerView.post(new Runnable() {
             @Override
             public void run() {
-                claimAdapter.notifyItemInserted(claimList.size() - 1);
-                Query query = firestore.collection("claims").whereEqualTo("userID", u.getId()).orderBy("date", Query.Direction.DESCENDING).startAfter(lastResult).limit(5);
+                subClaimAdapter.notifyItemInserted(claimList.size() - 1);
+                Query query = firestore.collection("claims").whereEqualTo("managerID", u.getId()).orderBy("date", Query.Direction.DESCENDING).startAfter(lastResult).limit(5);
                 query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         claimList.remove(claimList.size() - 1);
                         int scrollPosition = claimList.size();
-                        claimAdapter.notifyItemRemoved(scrollPosition);
+                        subClaimAdapter.notifyItemRemoved(scrollPosition);
 
                         for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
                             Claim claim = documentSnapshot.toObject(Claim.class);
                             claimList.add(claim);
                         }
                         //get the last document of the snapshot
-                        claimAdapter.notifyDataSetChanged();
+                        subClaimAdapter.notifyDataSetChanged();
                         if(queryDocumentSnapshots.size() > 0) {
                             lastResult = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
                         }

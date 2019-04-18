@@ -169,14 +169,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyClaimFragment()).commit();
                 break;
             case R.id.nav_subClaims:
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SubClaimFragment()).commit();
                 break;
-//            case R.id.nav_share:
-//                //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
-//                break;
-//            case R.id.nav_send:
-//                //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ).commit();
-//                break;
             case R.id.nav_signOut:
                 builder.setMessage("Are you sure to Sign Out?")
                         .setCancelable(false)

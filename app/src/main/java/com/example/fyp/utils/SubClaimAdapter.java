@@ -1,6 +1,7 @@
 package com.example.fyp.utils;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -11,42 +12,48 @@ import android.widget.TextView;
 
 import com.example.fyp.R;
 import com.example.fyp.ViewMyClaimActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class SubClaimAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Claim> claimList;
 
     private final int VIEW_ITEM = 0;
     private final int VIEW_LOADING = 1;
+    User u;
 
 
-    public ClaimAdapter(List<Claim> claimList){
+    public SubClaimAdapter(List<Claim> claimList){
         this.claimList = claimList;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if(viewType == VIEW_ITEM){
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.claim_list_row,parent,false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sub_claim_row,parent,false);
 
-            return new ItemViewHolder(view);
+            return new SubClaimAdapter.ItemViewHolder(view);
         }else{
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loading,parent,false);
 
-            return new LoadingViewHolder(itemView);
+            return new SubClaimAdapter.LoadingViewHolder(itemView);
         }
 
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        if(viewHolder instanceof ItemViewHolder){
-            populateItem((ItemViewHolder) viewHolder, position);
-        }else if(viewHolder instanceof LoadingViewHolder){
-            showLoadingView((LoadingViewHolder) viewHolder, position);
+        if(viewHolder instanceof SubClaimAdapter.ItemViewHolder){
+            populateItem((SubClaimAdapter.ItemViewHolder) viewHolder, position);
+        }else if(viewHolder instanceof SubClaimAdapter.LoadingViewHolder){
+            showLoadingView((SubClaimAdapter.LoadingViewHolder) viewHolder, position);
         }
     }
 
@@ -60,7 +67,7 @@ public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder{
-        public TextView date, amount, status;
+        public TextView date, amount, status, name;
         public Claim claim;
 
         public ItemViewHolder(View view){
@@ -68,6 +75,7 @@ public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             date = view.findViewById(R.id.date);
             amount = view.findViewById(R.id.amount);
             status = view.findViewById(R.id.status);
+            name = view.findViewById(R.id.name);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -94,11 +102,11 @@ public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    private void showLoadingView(LoadingViewHolder viewHolder, int position){
+    private void showLoadingView(SubClaimAdapter.LoadingViewHolder viewHolder, int position){
 //        viewHolder.progressBar.setIndeterminate(true);
     }
 
-    private void populateItem(ItemViewHolder viewHolder, int position){
+    private void populateItem(final SubClaimAdapter.ItemViewHolder viewHolder, int position){
         Claim claim = claimList.get(position);
 
         Calendar cal = Calendar.getInstance();
@@ -108,8 +116,16 @@ public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.date.setText(date);
         viewHolder.amount.setText("RM" +String.valueOf(claim.getAmount()));
         viewHolder.status.setText(claim.getStatus());
+
+        FirebaseFirestore fs = FirebaseFirestore.getInstance();
+        fs.collection("users").document(claim.getUserID()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                u = documentSnapshot.toObject(User.class);
+                viewHolder.name.setText(u.getName());
+            }
+        });
+
         viewHolder.setClaim(claim);
     }
-
-
 }
