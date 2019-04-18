@@ -21,6 +21,7 @@ public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private final int VIEW_ITEM = 0;
     private final int VIEW_LOADING = 1;
+    private final int MY_CLAIM = 0;
 
 
     public ClaimAdapter(List<Claim> claimList){
@@ -74,6 +75,7 @@ public class ClaimAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 public void onClick(View view) {
                     Intent intent = new Intent(view.getContext(), ViewMyClaimActivity.class);
                     intent.putExtra("claimObj",claim);
+                    intent.putExtra("claim",MY_CLAIM);
                     view.getContext().startActivity(intent);
                 }
             });

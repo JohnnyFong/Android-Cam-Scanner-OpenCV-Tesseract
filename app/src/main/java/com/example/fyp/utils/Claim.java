@@ -11,6 +11,7 @@ public class Claim implements Serializable {
     private String department;
     private Date date;
     private String photoPath;
+    private String id;
 
     public Claim(){}
 
@@ -22,6 +23,14 @@ public class Claim implements Serializable {
         this.department = department;
         this.date = date;
         this.photoPath = photoPath;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPhotoPath() {

@@ -4,22 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ViewMyClaimActivity">
+    tools:context=".ViewMyClaimActivity"
+    android:id="@+id/constraintLayout">
 
-    <!--Progress bar-->
-    <RelativeLayout
-        android:id="@+id/loadingPanel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal" >
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
-
-    </RelativeLayout>
 
     <!--Claim-->
     <ScrollView
@@ -66,7 +54,8 @@
                     <EditText android:id="@+id/input_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Status" />
+                        android:hint="Status"
+                        android:inputType="textCapWords"/>
                 </android.support.design.widget.TextInputLayout>
 
                 <!-- Amount Label -->
@@ -106,9 +95,47 @@
                         android:hint="Manager" />
                 </android.support.design.widget.TextInputLayout>
 
+                <!-- Name -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp">
+                    <EditText android:id="@+id/input_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Submitted by" />
+                </android.support.design.widget.TextInputLayout>
+
+                <!--Approve button-->
+                <android.support.v7.widget.AppCompatButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Approve"
+                    android:id="@+id/btn_approve"/>
+                <android.support.v7.widget.AppCompatButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Reject"
+                    android:id="@+id/btn_reject"/>
             </LinearLayout>
 
         </RelativeLayout>
     </ScrollView>
+
+    <!--Progress bar-->
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal" >
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

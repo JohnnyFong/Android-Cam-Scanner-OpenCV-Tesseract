@@ -27,6 +27,7 @@ public class SubClaimAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private final int VIEW_ITEM = 0;
     private final int VIEW_LOADING = 1;
+    private final int SUB_CLAIM = 1;
     User u;
 
 
@@ -82,6 +83,7 @@ public class SubClaimAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHold
                 public void onClick(View view) {
                     Intent intent = new Intent(view.getContext(), ViewMyClaimActivity.class);
                     intent.putExtra("claimObj",claim);
+                    intent.putExtra("claim", SUB_CLAIM);
                     view.getContext().startActivity(intent);
                 }
             });

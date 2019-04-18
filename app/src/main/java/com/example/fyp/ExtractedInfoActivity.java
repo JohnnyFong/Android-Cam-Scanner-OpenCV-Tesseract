@@ -114,7 +114,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("CurrentUser", null);
             User u = gson.fromJson(json, User.class);
-            claim = new Claim(u.getId(),"pending",Double.valueOf(inputPrice.getText().toString()),u.getLineManager(),u.getDepartment(), date, date.toString()+".jpg");
+            claim = new Claim(u.getId(),"Pending",Double.valueOf(inputPrice.getText().toString()),u.getLineManager(),u.getDepartment(), date, date.toString()+".jpg");
 
             UploadTask uploadTask = ref.putBytes(data);
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -124,15 +124,26 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                     fs.collection("claims").add(claim).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            ImageConstant.selectedImageBitmap = receiptBM;
-                            Intent intent = new Intent(getApplicationContext(),ClaimResultActivity.class);
-                            intent.putExtra("claimObj",claim);
-                            startActivity(intent);
+                            claim.setId(documentReference.getId());
+                            fs.collection("claims").document(documentReference.getId()).set(claim).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    ImageConstant.selectedImageBitmap = receiptBM;
+                                    Intent intent = new Intent(getApplicationContext(),ClaimResultActivity.class);
+                                    intent.putExtra("claimObj",claim);
+                                    startActivity(intent);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(getApplicationContext(), "Claim has not been created correctly. Please check your connection and try again.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getApplicationContext(), "Claim has not been created. Please check your connection.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Claim has not been created. Please check your connection and try again.", Toast.LENGTH_SHORT).show();
                         }
                     });
 
