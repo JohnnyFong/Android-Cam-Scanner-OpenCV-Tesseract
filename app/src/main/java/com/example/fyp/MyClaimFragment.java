@@ -3,8 +3,12 @@ package com.example.fyp;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -40,6 +44,8 @@ public class MyClaimFragment extends Fragment {
     private boolean isLoading = false;
     private User u;
     private RelativeLayout progress;
+    private BottomSheetBehavior bottomSheetBehavior;
+    private LinearLayoutCompat bottomsheet;
 
     @Nullable
     @Override
@@ -65,6 +71,21 @@ public class MyClaimFragment extends Fragment {
 
         loadClaim(u.getId());
         initScrollListener();
+
+        bottomsheet = view.findViewById(R.id.bottom_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomsheet);
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }else{
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                }
+            }
+        });
 
         return view;
     }
