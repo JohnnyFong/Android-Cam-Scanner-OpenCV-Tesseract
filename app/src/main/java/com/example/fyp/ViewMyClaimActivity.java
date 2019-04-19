@@ -159,7 +159,7 @@ public class ViewMyClaimActivity extends AppCompatActivity {
     private void processClaim(int flag){
 
         if(flag == APPROVE_FLAG){
-            word = "Approve";
+            word = "Approved";
         }else{
             word = "Rejected";
         }
@@ -175,6 +175,8 @@ public class ViewMyClaimActivity extends AppCompatActivity {
                 snacbarText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_done_black_24dp,0);
                 snackbar.show();
                 status.setText(word);
+                approve.setVisibility(View.GONE);
+                reject.setVisibility(View.GONE);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
