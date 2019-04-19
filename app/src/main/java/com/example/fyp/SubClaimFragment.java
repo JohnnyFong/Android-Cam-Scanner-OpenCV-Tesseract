@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -19,8 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
@@ -28,7 +32,9 @@ import com.example.fyp.utils.Claim;
 import com.example.fyp.utils.ClaimAdapter;
 import com.example.fyp.utils.SubClaimAdapter;
 import com.example.fyp.utils.User;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -64,6 +70,11 @@ public class SubClaimFragment extends Fragment {
     private final Calendar myCalendar = Calendar.getInstance();
     private DatePickerDialog.OnDateSetListener date;
     private Query query;
+    private LinearLayout checkboxContainer;
+    private CheckBox checkBox;
+    private ArrayList<String> employees = new ArrayList<>();
+    private ArrayList<CheckBox> employeesCheckbox = new ArrayList<>();
+    private ArrayList<String> emp = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,6 +89,7 @@ public class SubClaimFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(subClaimAdapter);
         swipeContainer = view.findViewById(R.id.swipeContainer);
+        checkboxContainer = view.findViewById(R.id.checkbox_container);
 
         firestore = FirebaseFirestore.getInstance();
 
@@ -86,7 +98,7 @@ public class SubClaimFragment extends Fragment {
         String json = sharedPreferences.getString("CurrentUser", null);
         u = gson.fromJson(json, User.class);
 
-        query = firestore.collection("claims").whereEqualTo("managerID", u.getId()).orderBy("date", Query.Direction.DESCENDING);
+        query = firestore.collection("claims").whereEqualTo("managerID", u.getId());
 
         loadClaim();
         initScrollListener();
@@ -142,7 +154,64 @@ public class SubClaimFragment extends Fragment {
             }
         });
 
+
+
         return view;
+    }
+
+    public void loadEmployeesCheckbox(){
+
+        for (Claim claim:claimList) {
+            firestore.collection("users").document(claim.getUserID()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    Boolean f = true;
+                    if(employees.isEmpty()){
+                        //if employees list is empty just add
+                        employees.add((String) documentSnapshot.get("name"));
+
+
+                    }else{
+                        //check if the list already has the name
+                        for (String name:employees){
+                            String n = (String) documentSnapshot.get("name");
+                            if(name.equals(documentSnapshot.get("name"))){
+                                //has the name, change the flag to false
+                                f = false;
+                            }
+                        }
+
+                        if(f){
+                            //flag is true, means the list does not have the name, so add the name into the list
+                            employees.add((String) documentSnapshot.get("name"));
+                        }
+                    }
+
+                    if(f){
+                        //add the list to checkbox arraylist
+                        checkBox = new CheckBox(getContext());
+                        checkBox.setText((String) documentSnapshot.get("name"));
+                        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                if(b){
+                                    //checked
+                                    emp.add(compoundButton.getText().toString());
+                                }else{
+                                    //not checked
+                                    if(!emp.isEmpty()) {
+                                        emp.remove(compoundButton.getText().toString());
+                                    }
+                                }
+                            }
+                        });
+                        employeesCheckbox.add(checkBox);
+                        checkboxContainer.addView(checkBox);
+                    }
+                }
+            });
+        }
     }
 
     public void filterClaim(){
@@ -171,29 +240,24 @@ public class SubClaimFragment extends Fragment {
                 if(status.equals("All")) {
                     query = firestore.collection("claims")
                             .whereEqualTo("managerID", u.getId())
-                            .whereGreaterThan("date",d)
-                            .orderBy("date", Query.Direction.DESCENDING);
+                            .whereGreaterThan("date",d);
                 }else{
                     query = firestore.collection("claims")
                             .whereEqualTo("managerID", u.getId())
                             .whereEqualTo("status",status)
-                            .whereGreaterThan("date",d)
-                            .orderBy("date", Query.Direction.DESCENDING);
+                            .whereGreaterThan("date",d);
                 }
             }
         }else{
             //date is empty
-
             //change the query then call load function
             if(status.equals("All")) {
                 query = firestore.collection("claims")
-                        .whereEqualTo("managerID", u.getId())
-                        .orderBy("date", Query.Direction.DESCENDING);
+                        .whereEqualTo("managerID", u.getId());
             }else{
                 query = firestore.collection("claims")
                         .whereEqualTo("managerID", u.getId())
-                        .whereEqualTo("status",status)
-                        .orderBy("date", Query.Direction.DESCENDING);
+                        .whereEqualTo("status",status);
             }
         }
 
@@ -222,7 +286,7 @@ public class SubClaimFragment extends Fragment {
     public void loadClaim(){
         progress.setVisibility(View.VISIBLE);
 
-        query.limit(10).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        query.orderBy("date", Query.Direction.DESCENDING).limit(10).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
@@ -240,8 +304,12 @@ public class SubClaimFragment extends Fragment {
                     isLoading = true;
                 }
                 swipeContainer.setRefreshing(false);
+
+                loadEmployeesCheckbox();
             }
         });
+
+
 
     }
 
@@ -254,7 +322,7 @@ public class SubClaimFragment extends Fragment {
             public void run() {
                 subClaimAdapter.notifyItemInserted(claimList.size() - 1);
 //                Query query = firestore.collection("claims").whereEqualTo("managerID", u.getId()).orderBy("date", Query.Direction.DESCENDING).startAfter(lastResult).limit(5);
-                query.startAfter(lastResult).limit(5).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                query.orderBy("date", Query.Direction.DESCENDING).startAfter(lastResult).limit(5).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         claimList.remove(claimList.size() - 1);
@@ -271,6 +339,8 @@ public class SubClaimFragment extends Fragment {
                             lastResult = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
                         }
                         isLoading = false;
+
+                        loadEmployeesCheckbox();
                     }
                 });
             }

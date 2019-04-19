@@ -52,6 +52,10 @@ public class ScanDocFragment extends Fragment {
     }
 
     private void getImage(View view, int REQUEST_CODE){
+        Gson gson = new Gson();
+        sharedPreferences = this.getActivity().getSharedPreferences("sharePreferences",MODE_PRIVATE);
+        String json = sharedPreferences.getString("CurrentUser", null);
+        u = gson.fromJson(json, User.class);
         if(u.getLineManager().equals("")){
             Toast.makeText(this.getContext(),"Please ensure that you have a line manager before submitting a claim.", Toast.LENGTH_LONG).show();
         }else{
