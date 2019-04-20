@@ -57,7 +57,7 @@ public class MyClaimFragment extends Fragment {
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayoutCompat bottomsheet;
     private Spinner statusSpinner;
-    private Button btnFilter;
+    private Button btnFilter, btnReset;
     private EditText dateFilter;
     private final Calendar myCalendar = Calendar.getInstance();
     private DatePickerDialog.OnDateSetListener date;
@@ -111,7 +111,12 @@ public class MyClaimFragment extends Fragment {
         btnFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                filterClaim();
+                if(!claimList.isEmpty()) {
+                    filterClaim();
+                }else{
+                    Toast.makeText(getContext(), "No claim to filter.", Toast.LENGTH_LONG).show();
+                }
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
 
@@ -130,6 +135,21 @@ public class MyClaimFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 new DatePickerDialog(view.getContext(),date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        btnReset = view.findViewById(R.id.btn_reset);
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!claimList.isEmpty()){
+                    claimList.clear();
+                    query = firestore.collection("claims").whereEqualTo("userID", u.getId()).orderBy("date", Query.Direction.DESCENDING);
+                    loadClaim();
+                }else{
+                    Toast.makeText(getContext(), "No claim to Reset.", Toast.LENGTH_LONG).show();
+                }
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
 

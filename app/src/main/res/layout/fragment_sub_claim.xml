@@ -47,7 +47,6 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/managerText"
                 android:text="Status"
                 android:textColor="?android:textColorHint"
                 android:paddingLeft="4dp"
@@ -75,17 +74,33 @@
                     android:inputType="phone" />
             </android.support.design.widget.TextInputLayout>
 
-            <LinearLayout
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:paddingBottom="16dp"-->
+                <!--android:paddingLeft="16dp"-->
+                <!--android:paddingTop="16dp"-->
+                <!--android:paddingRight="16dp"-->
+                <!--android:orientation="vertical"-->
+                <!--android:id="@+id/checkbox_container">-->
+
+            <!--</LinearLayout>-->
+            <!--Status spinner-->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="16dp"
-                android:paddingLeft="16dp"
-                android:paddingTop="16dp"
-                android:paddingRight="16dp"
-                android:orientation="vertical"
-                android:id="@+id/checkbox_container">
-
-            </LinearLayout>
+                android:text="Employee"
+                android:textColor="?android:textColorHint"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingBottom="7dp" />
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/employee_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:spinnerMode="dialog"
+                android:background="@drawable/abc_edit_text_material"
+                style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
 
             <!-- Filter Button -->
@@ -93,10 +108,15 @@
                 android:id="@+id/btn_filter"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
                 android:padding="12dp"
                 android:text="Filter" />
+            <!-- Reset Button -->
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_reset"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="Reset" />
         </LinearLayout>
 
 

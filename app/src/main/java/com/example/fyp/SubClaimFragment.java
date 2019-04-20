@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.fyp.utils.Claim;
 import com.example.fyp.utils.ClaimAdapter;
@@ -62,19 +63,17 @@ public class SubClaimFragment extends Fragment {
     private boolean isLoading = false;
     private User u;
     private SwipeRefreshLayout swipeContainer;
-    private Spinner statusSpinner;
+    private Spinner statusSpinner, employeeSpinner;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayoutCompat bottomsheet;
-    private Button btnFilter;
+    private Button btnFilter, btnReset;
     private EditText dateFilter;
     private final Calendar myCalendar = Calendar.getInstance();
     private DatePickerDialog.OnDateSetListener date;
     private Query query;
-    private LinearLayout checkboxContainer;
-    private CheckBox checkBox;
-    private ArrayList<String> employees = new ArrayList<>();
-    private ArrayList<CheckBox> employeesCheckbox = new ArrayList<>();
-    private ArrayList<String> emp = new ArrayList<>();
+    private ArrayList<User> employees = new ArrayList<>();
+    private ArrayAdapter<User> employeeAdapter;
+    private boolean oneTime = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -89,7 +88,7 @@ public class SubClaimFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(subClaimAdapter);
         swipeContainer = view.findViewById(R.id.swipeContainer);
-        checkboxContainer = view.findViewById(R.id.checkbox_container);
+        employeeSpinner = view.findViewById(R.id.employee_spinner);
 
         firestore = FirebaseFirestore.getInstance();
 
@@ -132,7 +131,12 @@ public class SubClaimFragment extends Fragment {
         btnFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                filterClaim();
+                if(!claimList.isEmpty()){
+                    filterClaim();
+                }else{
+                    Toast.makeText(getContext(), "No claim to filter.", Toast.LENGTH_LONG).show();
+                }
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
 
@@ -154,73 +158,72 @@ public class SubClaimFragment extends Fragment {
             }
         });
 
+        btnReset = view.findViewById(R.id.btn_reset);
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!claimList.isEmpty()){
+                    claimList.clear();
+                    query = firestore.collection("claims").whereEqualTo("managerID", u.getId());
+                    loadClaim();
+                }else{
+                    Toast.makeText(getContext(), "No claim to Reset.", Toast.LENGTH_LONG).show();
+                }
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
+
 
 
         return view;
     }
 
-    public void loadEmployeesCheckbox(){
-
-        for (Claim claim:claimList) {
+    public void laodEmployeeSpinner(){
+        employees.clear();
+        User u = new User();
+        u.setName("All");
+        employees.add(u);
+        employeeAdapter = new ArrayAdapter<User>(getContext(), android.R.layout.simple_spinner_item, employees);
+        employeeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        employeeSpinner.setAdapter(employeeAdapter);
+        for(Claim claim:claimList){
             firestore.collection("users").document(claim.getUserID()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    Boolean f = true;
-                    if(employees.isEmpty()){
-                        //if employees list is empty just add
-                        employees.add((String) documentSnapshot.get("name"));
+                    if(task.isSuccessful()){
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        Boolean f = true;
 
-
-                    }else{
                         //check if the list already has the name
-                        for (String name:employees){
-                            String n = (String) documentSnapshot.get("name");
-                            if(name.equals(documentSnapshot.get("name"))){
+                        for (User user:employees){
+                            if(user.getName().equals((String) documentSnapshot.get("name"))){
                                 //has the name, change the flag to false
                                 f = false;
                             }
-                        }
 
+                        }
                         if(f){
                             //flag is true, means the list does not have the name, so add the name into the list
-                            employees.add((String) documentSnapshot.get("name"));
+                            employees.add(documentSnapshot.toObject(User.class));
+                            employeeAdapter.notifyDataSetChanged();
                         }
                     }
 
-                    if(f){
-                        //add the list to checkbox arraylist
-                        checkBox = new CheckBox(getContext());
-                        checkBox.setText((String) documentSnapshot.get("name"));
-                        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                                if(b){
-                                    //checked
-                                    emp.add(compoundButton.getText().toString());
-                                }else{
-                                    //not checked
-                                    if(!emp.isEmpty()) {
-                                        emp.remove(compoundButton.getText().toString());
-                                    }
-                                }
-                            }
-                        });
-                        employeesCheckbox.add(checkBox);
-                        checkboxContainer.addView(checkBox);
-                    }
                 }
             });
         }
+        oneTime = false;
     }
 
     public void filterClaim(){
         String status;
         String startingDate;
+        User e;
         Date d = null;
         Boolean flag = true;
         status = (String) statusSpinner.getSelectedItem();
         startingDate = dateFilter.getText().toString();
+        e = (User) employeeSpinner.getSelectedItem();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy");
         if(startingDate.isEmpty()){
@@ -237,30 +240,63 @@ public class SubClaimFragment extends Fragment {
 
             if(flag){
                 //change the query then call load function
-                if(status.equals("All")) {
+
+                //if no employee selected
+                //no status (All)
+                if (status.equals("All") && e.toString().equals("All")) {
                     query = firestore.collection("claims")
                             .whereEqualTo("managerID", u.getId())
-                            .whereGreaterThan("date",d);
-                }else{
+                            .whereGreaterThan("date", d);
+                } else if (status.equals("All") && !e.toString().equals("All")){
+                    //if no status, but got employee
                     query = firestore.collection("claims")
                             .whereEqualTo("managerID", u.getId())
-                            .whereEqualTo("status",status)
-                            .whereGreaterThan("date",d);
+                            .whereEqualTo("userID",e.getId())
+                            .whereGreaterThan("date", d);
+                } else if (!status.equals("All") && e.toString().equals("All")){
+                    //if got status, but no employee
+                    query = firestore.collection("claims")
+                            .whereEqualTo("managerID", u.getId())
+                            .whereEqualTo("status", status)
+                            .whereGreaterThan("date", d);
+                }else {
+                    //if got status, got employee
+                    query = firestore.collection("claims")
+                            .whereEqualTo("managerID", u.getId())
+                            .whereEqualTo("userID", e.getId())
+                            .whereEqualTo("status", status)
+                            .whereGreaterThan("date", d);
                 }
+            }else{
+                Toast.makeText(getContext(),"Unable to filter, please make sure the connection is stable and try again.",Toast.LENGTH_LONG).show();
             }
         }else{
             //date is empty
             //change the query then call load function
-            if(status.equals("All")) {
+
+            //no employee
+            //no status
+            if(status.equals("All") && e.toString().equals("All")) {
                 query = firestore.collection("claims")
                         .whereEqualTo("managerID", u.getId());
-            }else{
+            }else if (status.equals("All") && !e.toString().equals("All")){
+                //if no status but got employee
+                query = firestore.collection("claims")
+                        .whereEqualTo("managerID", u.getId())
+                        .whereEqualTo("userID", e.getId());
+            }else if (!status.equals("All") && e.toString().equals("All")){
+                //if got status but no employee
                 query = firestore.collection("claims")
                         .whereEqualTo("managerID", u.getId())
                         .whereEqualTo("status",status);
+            }else{
+                //if got status got employee
+                query = firestore.collection("claims")
+                        .whereEqualTo("managerID", u.getId())
+                        .whereEqualTo("userID", e.getId())
+                        .whereEqualTo("status",status);
             }
         }
-
         claimList.clear();
         loadClaim();
     }
@@ -305,7 +341,9 @@ public class SubClaimFragment extends Fragment {
                 }
                 swipeContainer.setRefreshing(false);
 
-                loadEmployeesCheckbox();
+                if(oneTime){
+                    laodEmployeeSpinner();
+                }
             }
         });
 
@@ -339,8 +377,6 @@ public class SubClaimFragment extends Fragment {
                             lastResult = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
                         }
                         isLoading = false;
-
-                        loadEmployeesCheckbox();
                     }
                 });
             }
