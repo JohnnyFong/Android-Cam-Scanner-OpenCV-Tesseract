@@ -142,13 +142,9 @@ public class MyClaimFragment extends Fragment {
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!claimList.isEmpty()){
                     claimList.clear();
                     query = firestore.collection("claims").whereEqualTo("userID", u.getId()).orderBy("date", Query.Direction.DESCENDING);
                     loadClaim();
-                }else{
-                    Toast.makeText(getContext(), "No claim to Reset.", Toast.LENGTH_LONG).show();
-                }
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
