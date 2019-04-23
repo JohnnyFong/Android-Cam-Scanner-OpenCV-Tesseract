@@ -235,7 +235,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                             if(words[i].matches(regExp)){
                                 p=words[i];
                             }
-                        }else if(words[i].toLowerCase().equals("total")){//when total is found j is the line, i is the index of the word total
+                        }else if(words[i].toLowerCase().equals("total") || words[i].toLowerCase().equals("total:")|| words[i].toLowerCase().equals("totali")){//when total is found j is the line, i is the index of the word total
                             cnt = true;//found the total, put the remainding string into this price variable
                         }
 
