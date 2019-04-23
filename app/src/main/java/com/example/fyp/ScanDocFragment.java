@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -13,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +35,10 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -51,6 +57,7 @@ public class ScanDocFragment extends Fragment {
     private int xPoint=0;
     private double weeklyTotal = 0.0;
     private TextView weeklyText;
+    private FrameLayout frameLayout;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,7 +66,7 @@ public class ScanDocFragment extends Fragment {
         fab = view.findViewById(R.id.fab);
         cameraFab = view.findViewById(R.id.camera_fab);
         galleryFab = view.findViewById(R.id.gallery_fab);
-
+        frameLayout = view.findViewById(R.id.frameLayout);
         fireStore = FirebaseFirestore.getInstance();
 
         Gson gson = new Gson();
@@ -109,32 +116,6 @@ public class ScanDocFragment extends Fragment {
 
     }
 
-//    private DataPoint[] getWeeklyDataPoint(){
-//        //do query to find out the daily expenditure amount, then plot the graph
-//
-//        Date currentDate = Calendar.getInstance().getTime();
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(currentDate);
-//        calendar.set(Calendar.DAY_OF_WEEK, 2);
-//        Date startOfWeek = (Date) DateFormat.format("dd-MM-yyyy", calendar);
-//
-//        getWeeklyQuery(startOfWeek);
-//
-//
-//
-//        DataPoint[] dp = new DataPoint[]{
-//                new DataPoint(0,3),
-//                new DataPoint(2,11),
-//                new DataPoint(4,7),
-//                new DataPoint(6,6),
-//                new DataPoint(8,1),
-//                new DataPoint(10,1),
-//                new DataPoint(12,1),
-//        };
-//
-//        return dp;
-//    }
-
     private void getWeeklyQuery(Date startOfWeek1, Date startOfWeek2){
         Calendar c1 = Calendar.getInstance();
         c1.setTime(startOfWeek1);
@@ -159,7 +140,7 @@ public class ScanDocFragment extends Fragment {
 
         Log.d("fb","START");
 
-        fireStore.collection("claims").whereEqualTo("userID", u.getId()).whereGreaterThanOrEqualTo("date", startOfWeek1).whereLessThanOrEqualTo("date",startOfWeek2).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        fireStore.collection("claims").whereEqualTo("userID", u.getId()).whereEqualTo("status","Approved").whereGreaterThanOrEqualTo("date", startOfWeek1).whereLessThanOrEqualTo("date",startOfWeek2).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d("fb","success");
@@ -233,6 +214,36 @@ public class ScanDocFragment extends Fragment {
         staticLabelsFormatter.setHorizontalLabels(new String[] {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"});
         weeklyGraph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
         weeklyGraph.getGridLabelRenderer().setHorizontalLabelsAngle(120);
+
+        weeklySeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Double xPoint = dataPoint.getX();
+                String day ="";
+                if(xPoint.equals(0.0)){
+                    day = "Monday";
+                }else if(xPoint.equals(2.0)){
+                    day = "Tuesday";
+                }else if(xPoint.equals(4.0)){
+                    day = "Wednesday";
+                }else if(xPoint.equals(6.0)){
+                    day = "Thursday";
+                }else if(xPoint.equals(8.0)){
+                    day = "Friday";
+                }else if(xPoint.equals(10.0)){
+                    day = "Saturday";
+                }else if(xPoint.equals(12.0)){
+                    day = "Sunday";
+                }
+
+                Snackbar snackbar = Snackbar.make(frameLayout, "RM "+ dataPoint.getY()+" had been claimed on "+ day+".", Snackbar.LENGTH_SHORT);
+
+                View snackbarView = snackbar.getView();
+                TextView snacbarText = snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+                snacbarText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_done_black_24dp,0);
+                snackbar.show();
+            }
+        });
 
     }
 
