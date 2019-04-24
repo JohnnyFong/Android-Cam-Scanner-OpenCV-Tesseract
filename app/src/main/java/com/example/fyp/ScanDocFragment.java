@@ -54,9 +54,9 @@ public class ScanDocFragment extends Fragment {
     private GraphView weeklyGraph, monthlyGraph;
     private LineGraphSeries<DataPoint> weeklySeries, monthlySeries;
     private FirebaseFirestore fireStore;
-    private int xPoint=0;
-    private double weeklyTotal = 0.0;
-    private TextView weeklyText;
+    private int xPointW = 0;
+    private double weeklyTotal = 0.0, yearlyTotal, xPointY = 0.0;
+    private TextView weeklyText, yearlyText;
     private FrameLayout frameLayout;
     @Nullable
     @Override
@@ -82,6 +82,7 @@ public class ScanDocFragment extends Fragment {
         //monthly graph
         monthlyGraph = view.findViewById(R.id.monthly_graph);
         initMonthlyGraph(monthlyGraph);
+        yearlyText = view.findViewById(R.id.yearlyTotal);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,82 +109,29 @@ public class ScanDocFragment extends Fragment {
             }
         });
 
-
-
-
         return view;
-
-
     }
 
-    private void getWeeklyQuery(Date startOfWeek1, Date startOfWeek2){
-        Calendar c1 = Calendar.getInstance();
-        c1.setTime(startOfWeek1);
-        c1.add(Calendar.DATE, 1);
-        final Date nextDate1 = c1.getTime();
 
-        Calendar c2 = Calendar.getInstance();
-        c2.setTime(startOfWeek2);
-        c2.add(Calendar.DATE, 1);
-        final Date nextDate2 = c2.getTime();
 
-        Calendar cal1 = Calendar.getInstance();
-        cal1.setTime(startOfWeek1);
-        String date1 = DateFormat.format("dd-MM-yyyy HH:mm:ss", cal1).toString();
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(startOfWeek2);
-        String date2 = DateFormat.format("dd-MM-yyyy HH:mm", cal).toString();
-
-        Log.d("timeofweek", date1);
-        Log.d("timeofweek", date2);
-
-        Log.d("fb","START");
-
-        fireStore.collection("claims").whereEqualTo("userID", u.getId()).whereEqualTo("status","Approved").whereGreaterThanOrEqualTo("date", startOfWeek1).whereLessThanOrEqualTo("date",startOfWeek2).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                Log.d("fb","success");
-                Log.d("query", String.valueOf(queryDocumentSnapshots.getDocuments().size()));
-                Double yPoint = 0.0;
-                for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                    Claim claim = documentSnapshot.toObject(Claim.class);
-                    yPoint += claim.getAmount();
-                    weeklyTotal = weeklyTotal + claim.getAmount();
-                    weeklyText.setText("RM "+String.valueOf(weeklyTotal));
-                }
-                weeklySeries.appendData(new DataPoint(xPoint, yPoint),false,10);
-                xPoint = xPoint +2;
-                if(xPoint <=12) {
-                    getWeeklyQuery(nextDate1, nextDate2);
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("fb", "FAILED");
-            }
-        });
-    }
-
-    private DataPoint[] getMonthlyDataPoint(){
-        //do query to find out the daily expenditure amount, then plot the graph
-        DataPoint[] dp = new DataPoint[]{
-                new DataPoint(0,3),
-                new DataPoint(0.2,11),
-                new DataPoint(0.4,7),
-                new DataPoint(0.6,6),
-                new DataPoint(0.8,1),
-                new DataPoint(1,2),
-                new DataPoint(1.2,2),
-                new DataPoint(1.4,2),
-                new DataPoint(1.6,2),
-                new DataPoint(1.8,2),
-                new DataPoint(2,2),
-                new DataPoint(2.2,2),
-        };
-        return dp;
-    }
+//    private DataPoint[] getMonthlyDataPoint(){
+//        //do query to find out the daily expenditure amount, then plot the graph
+//        DataPoint[] dp = new DataPoint[]{
+//                new DataPoint(0,3),
+//                new DataPoint(0.2,11),
+//                new DataPoint(0.4,7),
+//                new DataPoint(0.6,6),
+//                new DataPoint(0.8,1),
+//                new DataPoint(1,2),
+//                new DataPoint(1.2,2),
+//                new DataPoint(1.4,2),
+//                new DataPoint(1.6,2),
+//                new DataPoint(1.8,2),
+//                new DataPoint(2,2),
+//                new DataPoint(2.2,2),
+//        };
+//        return dp;
+//    }
 
     private void initWeeklyGraph(GraphView weeklyGraph){
         weeklySeries = new LineGraphSeries<>();
@@ -247,8 +195,49 @@ public class ScanDocFragment extends Fragment {
 
     }
 
+    private void getWeeklyQuery(Date startOfWeek1, Date startOfWeek2){
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(startOfWeek1);
+        c1.add(Calendar.DATE, 1);
+        final Date nextDate1 = c1.getTime();
+
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(startOfWeek2);
+        c2.add(Calendar.DATE, 1);
+        final Date nextDate2 = c2.getTime();
+
+        fireStore.collection("claims")
+                .whereEqualTo("userID", u.getId())
+                .whereEqualTo("status","Approved")
+                .whereGreaterThanOrEqualTo("date", startOfWeek1)
+                .whereLessThanOrEqualTo("date",startOfWeek2).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                    Log.d("fb","success");
+//                    Log.d("query", String.valueOf(queryDocumentSnapshots.getDocuments().size()));
+                    Double yPoint = 0.0;
+                    for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                        Claim claim = documentSnapshot.toObject(Claim.class);
+                        yPoint += claim.getAmount();
+                        weeklyTotal = weeklyTotal + claim.getAmount();
+                        weeklyText.setText("RM "+String.valueOf(weeklyTotal));
+                    }
+                    weeklySeries.appendData(new DataPoint(xPointW, yPoint),false,10);
+                    xPointW = xPointW +2;
+                    if(xPointW <=12) {
+                        getWeeklyQuery(nextDate1, nextDate2);
+                    }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("fb", "FAILED");
+            }
+        });
+    }
+
     private void initMonthlyGraph(GraphView monthlyGraph){
-        monthlySeries = new LineGraphSeries<>(getMonthlyDataPoint());
+        monthlySeries = new LineGraphSeries<>();
         monthlySeries.setDrawBackground(true);
         monthlySeries.setAnimated(true);
         monthlySeries.setDrawDataPoints(true);
@@ -257,11 +246,71 @@ public class ScanDocFragment extends Fragment {
         monthlyGraph.getLegendRenderer().setVisible(true);
         monthlyGraph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
 
+        //get the date instance
+        Date currentDate = Calendar.getInstance().getTime();
+        Calendar date1 = Calendar.getInstance();
+        date1.setTime(currentDate);
+        //change the date to 1st of Jan
+        date1.set(date1.get(Calendar.YEAR), 0, 1,0,0,0);
+
+        Calendar date2 = Calendar.getInstance();
+        date2.setTime(currentDate);
+        //change the date to last of Jan
+        date2.set(date2.get(Calendar.YEAR), 0, date2.getActualMaximum(Calendar.DATE),23,59,59);
+
+        Date startOfMonth1 = date1.getTime();
+        Date startOfMonth2 = date2.getTime();
+        getMonthlyQuery(startOfMonth1, startOfMonth2);
+
         //set label
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(monthlyGraph);
         staticLabelsFormatter.setHorizontalLabels(new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
         monthlyGraph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
         monthlyGraph.getGridLabelRenderer().setHorizontalLabelsAngle(120);
+    }
+
+    private void getMonthlyQuery(Date startOfMonth1, Date startOfMonth2){
+
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(startOfMonth1);
+        c1.add(Calendar.MONTH, 1);
+        final Date nextDate1 = c1.getTime();
+        final Date d = startOfMonth1;
+        Calendar c2 = c1;
+        //change the date to last of Jan
+        c2.set(c2.get(Calendar.YEAR), c2.get(Calendar.MONTH), c2.getActualMaximum(Calendar.DATE),23,59,59);
+        final Date nextDate2 = c2.getTime();
+
+        fireStore.collection("claims")
+                .whereEqualTo("userID", u.getId())
+                .whereEqualTo("status","Approved")
+                .whereGreaterThanOrEqualTo("date", startOfMonth1)
+                .whereLessThanOrEqualTo("date",startOfMonth2).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    Log.d("fb","success");
+                    //Log.d("fb", d.toString());
+                    Log.d("query", String.valueOf(queryDocumentSnapshots.getDocuments().size()));
+                    Double yPoint = 0.0;
+                    for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                        Claim claim = documentSnapshot.toObject(Claim.class);
+                        yPoint += claim.getAmount();
+                        yearlyTotal = yearlyTotal + claim.getAmount();
+                        yearlyText.setText("RM "+String.valueOf(yearlyTotal));
+                    }
+                    monthlySeries.appendData(new DataPoint(xPointY, yPoint),false,13);
+                    xPointY = xPointY + 0.2;
+                    if(xPointY <=2.2) {
+                        getMonthlyQuery(nextDate1, nextDate2);
+                    }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("fb", "FAILED");
+            }
+        });
+
     }
 
     private void showFABMenu(){
