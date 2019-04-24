@@ -64,8 +64,7 @@
                     android:id="@+id/input_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Starting From"
-                    android:inputType="phone" />
+                    android:hint="Starting From"/>
             </android.support.design.widget.TextInputLayout>
             <!-- Filter Button -->
             <android.support.v7.widget.AppCompatButton

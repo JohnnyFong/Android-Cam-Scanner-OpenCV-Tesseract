@@ -79,6 +79,20 @@
                             android:textColor="#666"
                             android:textSize="14dp" />
 
+                        <!-- Date Label -->
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:layout_below="@+id/weeklyTotal">
+
+                            <EditText
+                                android:id="@+id/input_date"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Week Of"/>
+                        </android.support.design.widget.TextInputLayout>
+
                     </RelativeLayout>
                 </android.support.v7.widget.CardView>
 

@@ -1,5 +1,6 @@
 package com.example.fyp;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -58,6 +61,9 @@ public class ScanDocFragment extends Fragment {
     private double weeklyTotal = 0.0, yearlyTotal, xPointY = 0.0;
     private TextView weeklyText, yearlyText;
     private FrameLayout frameLayout;
+    private EditText dateFilter;
+    private final Calendar myCalendar = Calendar.getInstance();
+    private DatePickerDialog.OnDateSetListener date;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -74,10 +80,30 @@ public class ScanDocFragment extends Fragment {
         String json = sharedPreferences.getString("CurrentUser", null);
         u = gson.fromJson(json, User.class);
 
+        dateFilter = view.findViewById(R.id.input_date);
+        dateFilter.setFocusable(false);
+        date = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                updateLabel();
+            }
+        };
+        dateFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(view.getContext(),date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
         //weekly graph
         weeklyGraph = view.findViewById(R.id.weekly_graph);
         initWeeklyGraph(weeklyGraph);
         weeklyText = view.findViewById(R.id.weeklyTotal);
+
+
 
         //monthly graph
         monthlyGraph = view.findViewById(R.id.monthly_graph);
@@ -112,56 +138,44 @@ public class ScanDocFragment extends Fragment {
         return view;
     }
 
+    private void updateLabel(){
+        String myFormat = "dd-MM-yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
+        dateFilter.setText(sdf.format(myCalendar.getTime()));
 
+        Date d = myCalendar.getTime();
 
-//    private DataPoint[] getMonthlyDataPoint(){
-//        //do query to find out the daily expenditure amount, then plot the graph
-//        DataPoint[] dp = new DataPoint[]{
-//                new DataPoint(0,3),
-//                new DataPoint(0.2,11),
-//                new DataPoint(0.4,7),
-//                new DataPoint(0.6,6),
-//                new DataPoint(0.8,1),
-//                new DataPoint(1,2),
-//                new DataPoint(1.2,2),
-//                new DataPoint(1.4,2),
-//                new DataPoint(1.6,2),
-//                new DataPoint(1.8,2),
-//                new DataPoint(2,2),
-//                new DataPoint(2.2,2),
-//        };
-//        return dp;
-//    }
-
-    private void initWeeklyGraph(GraphView weeklyGraph){
-        weeklySeries = new LineGraphSeries<>();
-        weeklySeries.setDrawBackground(true);
-        weeklySeries.setAnimated(true);
-        weeklySeries.setDrawDataPoints(true);
-        weeklySeries.setTitle("Weekly Expenses");
-        weeklyGraph.addSeries(weeklySeries);
-        weeklyGraph.getLegendRenderer().setVisible(true);
-        weeklyGraph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
-
-        Date currentDate = Calendar.getInstance().getTime();
         Calendar date1 = Calendar.getInstance();
-        date1.setTime(currentDate);
+        date1.setTime(d);
         date1.set(Calendar.DAY_OF_WEEK, 2);
         date1.set(date1.get(Calendar.YEAR), date1.get(Calendar.MONTH), date1.get(Calendar.DATE),0,0,0);
 
         Calendar date2 = Calendar.getInstance();
-        date2.setTime(currentDate);
+        date2.setTime(d);
         date2.set(Calendar.DAY_OF_WEEK, 2);
         date2.set(date2.get(Calendar.YEAR), date2.get(Calendar.MONTH), date2.get(Calendar.DATE),23,59,59);
 
         Date startOfWeek1 = date1.getTime();
         Date startOfWeek2 = date2.getTime();
+        Log.d("dayofweek", startOfWeek1.toString());
+        Log.d("dayofweek", startOfWeek2.toString());
+
+        weeklyGraph.removeAllSeries();
+        addWeeklySeries();
+        weeklyGraph.addSeries(weeklySeries);
+        xPointW = 0;
+        weeklyTotal = 0.0;
+        weeklyText.setText("RM "+String.valueOf(weeklyTotal));
         getWeeklyQuery(startOfWeek1, startOfWeek2);
 
-        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(weeklyGraph);
-        staticLabelsFormatter.setHorizontalLabels(new String[] {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"});
-        weeklyGraph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-        weeklyGraph.getGridLabelRenderer().setHorizontalLabelsAngle(120);
+    }
+
+    private void addWeeklySeries(){
+        weeklySeries = new LineGraphSeries<>();
+        weeklySeries.setDrawBackground(true);
+        weeklySeries.setAnimated(true);
+        weeklySeries.setDrawDataPoints(true);
+        weeklySeries.setTitle("Weekly Expenses");
 
         weeklySeries.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
@@ -192,6 +206,40 @@ public class ScanDocFragment extends Fragment {
                 snackbar.show();
             }
         });
+
+    }
+
+    private void initWeeklyGraph(GraphView weeklyGraph){
+        addWeeklySeries();
+        weeklyGraph.addSeries(weeklySeries);
+        weeklyGraph.getLegendRenderer().setVisible(true);
+        weeklyGraph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+
+        Date currentDate = Calendar.getInstance().getTime();
+        Calendar date1 = Calendar.getInstance();
+        date1.setTime(currentDate);
+        date1.set(Calendar.DAY_OF_WEEK, 2);
+        date1.set(date1.get(Calendar.YEAR), date1.get(Calendar.MONTH), date1.get(Calendar.DATE),0,0,0);
+
+        Calendar date2 = Calendar.getInstance();
+        date2.setTime(currentDate);
+        date2.set(Calendar.DAY_OF_WEEK, 2);
+        date2.set(date2.get(Calendar.YEAR), date2.get(Calendar.MONTH), date2.get(Calendar.DATE),23,59,59);
+
+        Date startOfWeek1 = date1.getTime();
+        Date startOfWeek2 = date2.getTime();
+        getWeeklyQuery(startOfWeek1, startOfWeek2);
+
+        String myFormat = "dd-MM-yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
+        dateFilter.setText(sdf.format(date1.getTime()));
+
+        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(weeklyGraph);
+        staticLabelsFormatter.setHorizontalLabels(new String[] {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"});
+        weeklyGraph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        weeklyGraph.getGridLabelRenderer().setHorizontalLabelsAngle(120);
+
+
 
     }
 
@@ -267,6 +315,46 @@ public class ScanDocFragment extends Fragment {
         staticLabelsFormatter.setHorizontalLabels(new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
         monthlyGraph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
         monthlyGraph.getGridLabelRenderer().setHorizontalLabelsAngle(120);
+
+        monthlySeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Double xPoint = dataPoint.getX();
+                String month ="";
+                if(xPoint.equals(0.0)){
+                    month = "January";
+                }else if(xPoint.equals(0.2)){
+                    month = "February";
+                }else if(xPoint.equals(0.4)){
+                    month = "March";
+                }else if(xPoint.equals(0.6)){
+                    month = "April";
+                }else if(xPoint.equals(0.8)){
+                    month = "May";
+                }else if(xPoint.equals(1.0)){
+                    month = "June";
+                }else if(xPoint.equals(1.2)){
+                    month = "July";
+                }else if(xPoint.equals(1.4)){
+                    month = "August";
+                }else if(xPoint.equals(1.6)){
+                    month = "September";
+                }else if(xPoint.equals(1.8)){
+                    month = "October";
+                }else if(xPoint.equals(2.0)){
+                    month = "November";
+                }else if(xPoint.equals(2.2)){
+                    month = "December";
+                }
+
+                Snackbar snackbar = Snackbar.make(frameLayout, "RM "+ dataPoint.getY()+" had been claimed on "+ month+".", Snackbar.LENGTH_SHORT);
+
+                View snackbarView = snackbar.getView();
+                TextView snacbarText = snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+                snacbarText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_done_black_24dp,0);
+                snackbar.show();
+            }
+        });
     }
 
     private void getMonthlyQuery(Date startOfMonth1, Date startOfMonth2){
