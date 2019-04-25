@@ -157,6 +157,86 @@
 
                 </android.support.v7.widget.CardView>
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:text="Total approved claim amount of subordinate:" />
+
+                </RelativeLayout>
+
+
+                <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/card_view3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    card_view:cardCornerRadius="4dp"
+                    card_view:cardElevation="4sp"
+                    card_view:cardUseCompatPadding="true">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="16dp">
+
+                        <com.jjoe64.graphview.GraphView
+                            android:layout_width="match_parent"
+                            android:layout_height="250dp"
+                            android:id="@+id/sub_graph" />
+
+                        <TextView
+                            android:id="@+id/title3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/sub_graph"
+                            android:maxLines="3"
+                            android:layout_marginTop="8dp"
+                            android:text="Monthly expenditure claim"
+                            android:textColor="#222"
+                            android:textStyle="bold"
+                            android:textSize="22dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/title3"
+                            android:id="@+id/subTotal"
+                            android:maxLines="3"
+                            android:text="RM"
+                            android:textColor="#666"
+                            android:textSize="14dp" />
+                        <!--&lt;!&ndash;Status spinner&ndash;&gt;-->
+                        <!--<TextView-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:id="@+id/subText"-->
+                            <!--android:layout_below="@+id/subTotal"-->
+                            <!--android:text="Subordinate"-->
+                            <!--android:textColor="?android:textColorHint"-->
+                            <!--android:paddingLeft="4dp"-->
+                            <!--android:paddingRight="4dp"-->
+                            <!--android:paddingBottom="7dp" />-->
+                        <!--<android.support.v7.widget.AppCompatSpinner-->
+                            <!--android:id="@+id/sub_spinner"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="match_parent"-->
+                            <!--android:spinnerMode="dialog"-->
+                            <!--android:layout_below="@id/subText"-->
+                            <!--android:background="@drawable/abc_edit_text_material"-->
+                            <!--style="@style/Widget.AppCompat.Spinner.Underlined"/>-->
+
+                    </RelativeLayout>
+
+
+                </android.support.v7.widget.CardView>
+
             </LinearLayout>
 
         </RelativeLayout>

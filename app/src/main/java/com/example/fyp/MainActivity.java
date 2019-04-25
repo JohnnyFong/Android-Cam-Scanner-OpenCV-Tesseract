@@ -126,9 +126,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             if(doubleBack){
                 finish();//exit the application
+            }else{
+                Toast.makeText(this, "Please tap BACK again to exit", Toast.LENGTH_SHORT).show();
             }
             this.doubleBack = true;
-            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
             new Handler().postDelayed(new Runnable() {
 
@@ -137,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     doubleBack = false;
                 }
             }, 2000);
-
         }
     }
 

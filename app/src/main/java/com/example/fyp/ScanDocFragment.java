@@ -3,6 +3,7 @@ package com.example.fyp;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -30,6 +33,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -43,9 +47,13 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -54,16 +62,17 @@ public class ScanDocFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     FloatingActionButton fab, cameraFab, galleryFab;
     Boolean isFABOpen = false;
-    private GraphView weeklyGraph, monthlyGraph;
+    private GraphView weeklyGraph, monthlyGraph, subGraph;
     private LineGraphSeries<DataPoint> weeklySeries, monthlySeries;
     private FirebaseFirestore fireStore;
     private int xPointW = 0;
-    private double weeklyTotal = 0.0, yearlyTotal, xPointY = 0.0;
-    private TextView weeklyText, yearlyText;
+    private double weeklyTotal = 0.0, yearlyTotal= 0.0, subTotal = 0.0, xPointY = 0.0;
+    private TextView weeklyText, yearlyText, subText;
     private FrameLayout frameLayout;
     private EditText dateFilter;
     private final Calendar myCalendar = Calendar.getInstance();
     private DatePickerDialog.OnDateSetListener date;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -98,17 +107,21 @@ public class ScanDocFragment extends Fragment {
             }
         });
 
+
         //weekly graph
         weeklyGraph = view.findViewById(R.id.weekly_graph);
         initWeeklyGraph(weeklyGraph);
         weeklyText = view.findViewById(R.id.weeklyTotal);
 
-
-
         //monthly graph
         monthlyGraph = view.findViewById(R.id.monthly_graph);
         initMonthlyGraph(monthlyGraph);
         yearlyText = view.findViewById(R.id.yearlyTotal);
+
+        //subMonthly graph
+        subGraph = view.findViewById(R.id.sub_graph);
+        initSubGraph(subGraph);
+        subText = view.findViewById(R.id.subTotal);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,7 +219,162 @@ public class ScanDocFragment extends Fragment {
                 snackbar.show();
             }
         });
+    }
 
+    private LineGraphSeries<DataPoint> addSubSeries(final User emp, GraphView subGraph){
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+        LineGraphSeries<DataPoint> subSeries = new LineGraphSeries<>();
+        subSeries.setDrawBackground(true);
+        subSeries.setAnimated(true);
+        subSeries.setDrawDataPoints(true);
+        subSeries.setColor(color);
+        subSeries.setTitle(emp.getName());
+
+        subGraph.getLegendRenderer().setVisible(true);
+        subGraph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+
+        subSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Double xPoint = dataPoint.getX();
+
+                BigDecimal x = new BigDecimal(xPoint);
+                if(xPoint < 1.0){
+
+                    x = x.setScale(2, RoundingMode.DOWN);
+                    xPoint = x.doubleValue();
+                }else if (xPoint>1.4){
+                    x = x.setScale(2, RoundingMode.UP);
+                    xPoint = x.doubleValue();
+                }
+
+                String month ="";
+                if(xPoint.equals(0.0)){
+                    month = "January";
+                }else if(xPoint.equals(0.2)){
+                    month = "February";
+                }else if(xPoint.equals(0.4)){
+                    month = "March";
+                }else if(xPoint.equals(0.6)){
+                    month = "April";
+                }else if(xPoint.equals(0.8)){
+                    month = "May";
+                }else if(xPoint.equals(1.0)){
+                    month = "June";
+                }else if(xPoint.equals(1.2)){
+                    month = "July";
+                }else if(xPoint.equals(1.4)){
+                    month = "August";
+                }else if(xPoint.equals(1.6)){
+                    month = "September";
+                }else if(xPoint.equals(1.8)){
+                    month = "October";
+                }else if(xPoint.equals(2.0)){
+                    month = "November";
+                }else if(xPoint.equals(2.2)){
+                    month = "December";
+                }
+
+                Snackbar snackbar = Snackbar.make(frameLayout, emp.getName()+ " had claimed RM "+ dataPoint.getY()+" on "+ month+".", Snackbar.LENGTH_SHORT);
+
+                View snackbarView = snackbar.getView();
+                TextView snacbarText = snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+                snacbarText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_done_black_24dp,0);
+                snackbar.show();
+            }
+        });
+
+        return subSeries;
+    }
+
+    private void initSubGraph(final GraphView subGraph){
+
+        //get the date instance
+        Date currentDate = Calendar.getInstance().getTime();
+        Calendar date1 = Calendar.getInstance();
+        date1.setTime(currentDate);
+        //change the date to 1st of Jan
+        date1.set(date1.get(Calendar.YEAR), 0, 1,0,0,0);
+
+        Calendar date2 = Calendar.getInstance();
+        date2.setTime(currentDate);
+        //change the date to last of Jan
+        date2.set(date2.get(Calendar.YEAR), 0, date2.getActualMaximum(Calendar.DATE),23,59,59);
+
+        final Date startOfMonth1 = date1.getTime();
+        final Date startOfMonth2 = date2.getTime();
+
+        fireStore.collection("users").whereEqualTo("lineManager", u.getId()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                    //for each employee found, create a new series and add that series to the graph
+                    Double xPointS = 0.0;
+                    User emp = documentSnapshot.toObject(User.class);
+                    LineGraphSeries<DataPoint> subSeries = addSubSeries(emp, subGraph);
+                    subGraph.addSeries(subSeries);
+                    getSubQuery(startOfMonth1, startOfMonth2, emp, subSeries, xPointS);
+                }
+
+            }
+        });
+
+//        subGraph.addSeries(subSeries);
+
+
+        //set label
+        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(subGraph);
+        staticLabelsFormatter.setHorizontalLabels(new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
+        subGraph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        subGraph.getGridLabelRenderer().setHorizontalLabelsAngle(120);
+
+    }
+
+    private void getSubQuery(Date startOfMonth1, Date startOfMonth2, final User emp, final LineGraphSeries<DataPoint> subSeries,final Double xPointS){
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(startOfMonth1);
+        c1.add(Calendar.MONTH, 1);
+        final Date nextDate1 = c1.getTime();
+//        final Date d = startOfMonth1;
+        Calendar c2 = c1;
+        //change the date to last of Jan
+        c2.set(c2.get(Calendar.YEAR), c2.get(Calendar.MONTH), c2.getActualMaximum(Calendar.DATE),23,59,59);
+        final Date nextDate2 = c2.getTime();
+
+        Query query;
+
+        query = fireStore.collection("claims")
+                .whereEqualTo("managerID", u.getId())
+                .whereEqualTo("userID", emp.getId())
+                .whereEqualTo("status","Approved")
+                .whereGreaterThanOrEqualTo("date", startOfMonth1)
+                .whereLessThanOrEqualTo("date",startOfMonth2);
+
+
+        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Double yPoint = 0.0;
+                for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                    Claim claim = documentSnapshot.toObject(Claim.class);
+                    yPoint += claim.getAmount();
+                    subTotal = subTotal + claim.getAmount();
+                    subText.setText("RM "+String.valueOf(subTotal));
+                }
+                subSeries.appendData(new DataPoint(xPointS, yPoint),false,13);
+                Double xpoint = xPointS + 0.2;
+                if(xpoint <=2.2) {
+                    getSubQuery(nextDate1, nextDate2, emp, subSeries, xpoint);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("fb", "FAILED");
+            }
+        });
     }
 
     private void initWeeklyGraph(GraphView weeklyGraph){
@@ -237,9 +405,6 @@ public class ScanDocFragment extends Fragment {
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(weeklyGraph);
         staticLabelsFormatter.setHorizontalLabels(new String[] {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"});
         weeklyGraph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-        weeklyGraph.getGridLabelRenderer().setHorizontalLabelsAngle(120);
-
-
 
     }
 
@@ -320,6 +485,16 @@ public class ScanDocFragment extends Fragment {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
                 Double xPoint = dataPoint.getX();
+                BigDecimal x = new BigDecimal(xPoint);
+                if(xPoint < 1.0){
+
+                    x = x.setScale(2, RoundingMode.DOWN);
+                    xPoint = x.doubleValue();
+                }else if (xPoint>1.4){
+                    x = x.setScale(2, RoundingMode.UP);
+                    xPoint = x.doubleValue();
+                }
+
                 String month ="";
                 if(xPoint.equals(0.0)){
                     month = "January";
@@ -363,7 +538,7 @@ public class ScanDocFragment extends Fragment {
         c1.setTime(startOfMonth1);
         c1.add(Calendar.MONTH, 1);
         final Date nextDate1 = c1.getTime();
-        final Date d = startOfMonth1;
+//        final Date d = startOfMonth1;
         Calendar c2 = c1;
         //change the date to last of Jan
         c2.set(c2.get(Calendar.YEAR), c2.get(Calendar.MONTH), c2.getActualMaximum(Calendar.DATE),23,59,59);
@@ -376,9 +551,6 @@ public class ScanDocFragment extends Fragment {
                 .whereLessThanOrEqualTo("date",startOfMonth2).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    Log.d("fb","success");
-                    //Log.d("fb", d.toString());
-                    Log.d("query", String.valueOf(queryDocumentSnapshots.getDocuments().size()));
                     Double yPoint = 0.0;
                     for(QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
                         Claim claim = documentSnapshot.toObject(Claim.class);
