@@ -185,7 +185,7 @@ public class ScanDocFragment extends Fragment {
 
     private void addWeeklySeries(){
         weeklySeries = new LineGraphSeries<>();
-        weeklySeries.setDrawBackground(true);
+//        weeklySeries.setDrawBackground(true);
         weeklySeries.setAnimated(true);
         weeklySeries.setDrawDataPoints(true);
         weeklySeries.setTitle("Weekly Expenses");
@@ -226,7 +226,7 @@ public class ScanDocFragment extends Fragment {
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
 
         LineGraphSeries<DataPoint> subSeries = new LineGraphSeries<>();
-        subSeries.setDrawBackground(true);
+//        subSeries.setDrawBackground(true);
         subSeries.setAnimated(true);
         subSeries.setDrawDataPoints(true);
         subSeries.setColor(color);
@@ -451,7 +451,7 @@ public class ScanDocFragment extends Fragment {
 
     private void initMonthlyGraph(GraphView monthlyGraph){
         monthlySeries = new LineGraphSeries<>();
-        monthlySeries.setDrawBackground(true);
+//        monthlySeries.setDrawBackground(true);
         monthlySeries.setAnimated(true);
         monthlySeries.setDrawDataPoints(true);
         monthlySeries.setTitle("Monthly Expenses");

@@ -70,24 +70,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         title = navigationView.getHeaderView(0).findViewById(R.id.nav_title);
         subtitle = navigationView.getHeaderView(0).findViewById(R.id.nav_subtitle);
-        fireUser = fireAuth.getCurrentUser();
-        if(fireUser!=null){
-            fireStore.collection("users").document(fireUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    u = documentSnapshot.toObject(User.class);
-                    title.setText(u.getName());
-                    subtitle.setText(u.getEmail());
 
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    Gson gson = new Gson();
-                    String json = gson.toJson(u);
-                    editor.putString("CurrentUser", json);
-                    editor.apply();
-                }
-            });
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("CurrentUser", null);
+        User u = gson.fromJson(json, User.class);
+        if(u!=null){
+            title.setText(u.getName());
+            subtitle.setText(u.getEmail());
+
+            if(!u.getDepartment().equals("XgBpxDLAConKdJFLeVzc")){
+                Menu menu = navigationView.getMenu();
+                menu.findItem(R.id.nav_Department).setVisible(false);
+            }
         }
-
 
         navigationView.getHeaderView(0).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,6 +157,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_subClaims:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SubClaimFragment()).commit();
                 break;
+            case R.id.nav_Department:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DepartmentFragment()).commit();
+                break;
             case R.id.nav_signOut:
                 builder.setMessage("Are you sure to Sign Out?")
                         .setCancelable(false)
@@ -170,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 fireAuth.signOut();
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.clear();
+                                editor.apply();
+
                                 Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
                                 startActivity(intent);
                                 finish();

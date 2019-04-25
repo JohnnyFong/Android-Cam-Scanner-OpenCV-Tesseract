@@ -40,43 +40,71 @@ public class LoginActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         //check if the user is logged in or not
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
         if(currentUser != null){
             //user is logged in, direct to MainActivity
+
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
+
+//            final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this, R.style.Theme_AppCompat_DayNight_Dialog);
+//            progressDialog.setIndeterminate(true);
+//            progressDialog.setMessage("Loading...");
+//            progressDialog.show();
+
+//            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//            firestore.collection("users").document(currentUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                @Override
+//                public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                    User u = documentSnapshot.toObject(User.class);
+//
+//                    SharedPreferences.Editor editor = sharedPreferences.edit();
+//                    Gson gson = new Gson();
+//                    String json = gson.toJson(u);
+//                    editor.putString("CurrentUser", json);
+//                    editor.apply();
+//
+////                    progressDialog.dismiss();
+//                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                    startActivity(intent);
+//                    finish();
+//                }
+//            });
+        }else{
+            setContentView(R.layout.activity_login);
+            // Set up the login form.
+
+            sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
+
+            ScrollView sv = (ScrollView) findViewById(R.id.login_scroll);
+            sv.setVerticalScrollBarEnabled(false);
+            sv.setHorizontalScrollBarEnabled(false);
+
+            fireAuth = FirebaseAuth.getInstance();
+
+            inputEmail = (AutoCompleteTextView) findViewById(R.id.input_email);
+            inputPassword = (EditText) findViewById(R.id.input_password);
+
+
+            Button mEmailSignInButton = (Button) findViewById(R.id.btn_signin);
+            mEmailSignInButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    attemptLogin();
+                }
+            });
+
+            registerText = findViewById(R.id.registerText);
+            registerText.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent registerIntent = new Intent(getApplicationContext(), RegisterActivity.class);
+                    startActivity(registerIntent);
+                }
+            });
         }
-        setContentView(R.layout.activity_login);
-        // Set up the login form.
 
-        sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
-
-        ScrollView sv = (ScrollView) findViewById(R.id.login_scroll);
-        sv.setVerticalScrollBarEnabled(false);
-        sv.setHorizontalScrollBarEnabled(false);
-
-        fireAuth = FirebaseAuth.getInstance();
-
-        inputEmail = (AutoCompleteTextView) findViewById(R.id.input_email);
-        inputPassword = (EditText) findViewById(R.id.input_password);
-
-
-        Button mEmailSignInButton = (Button) findViewById(R.id.btn_signin);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
-
-        registerText = findViewById(R.id.registerText);
-        registerText.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent registerIntent = new Intent(getApplicationContext(), RegisterActivity.class);
-                startActivity(registerIntent);
-            }
-        });
 
 
     }
@@ -111,10 +139,9 @@ public class LoginActivity extends AppCompatActivity  {
                                 editor.apply();
 
                                 progressDialog.dismiss();
-                                Intent MainIntent = new Intent(getApplicationContext(), MainActivity.class);
-                                startActivity(MainIntent);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
                                 finish();
-                                Toast.makeText(LoginActivity.this, "Signed in", Toast.LENGTH_SHORT).show();
                             }
                         });
 

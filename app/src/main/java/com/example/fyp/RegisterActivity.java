@@ -1,9 +1,11 @@
 package com.example.fyp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,6 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.fyp.utils.User;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private RelativeLayout progress;
 
+    private SharedPreferences sharedPreferences;
+
     ArrayAdapter<Department> departmentAdapter;
     ArrayAdapter<User> userAdapter;
     List<Department> departments = new ArrayList<>();
@@ -69,6 +74,8 @@ public class RegisterActivity extends AppCompatActivity {
         registerScroll = findViewById(R.id.register_scroll);
         registerScroll.setVerticalScrollBarEnabled(false);
         registerScroll.setHorizontalScrollBarEnabled(false);
+
+        sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
 
         btnRegister = findViewById(R.id.btn_register);
         inputEmail = findViewById(R.id.input_email);
@@ -116,6 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //for each department found add it to the adapter for department spinner
                         Department d = document.toObject(Department.class);
+//                        Log.d("departmentid", d.getId());
                         d.setId(document.getId());
                         departments.add(d);
                     }
@@ -230,6 +238,13 @@ public class RegisterActivity extends AppCompatActivity {
                         fireStore.collection("users").document(fbUser.getUid()).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
+
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                Gson gson = new Gson();
+                                String json = gson.toJson(user);
+                                editor.putString("CurrentUser", json);
+                                editor.apply();
+
                                 progress.setVisibility(View.GONE);
                                 Toast.makeText(getApplicationContext(), "User Created" , Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
