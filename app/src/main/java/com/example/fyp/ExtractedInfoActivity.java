@@ -83,6 +83,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("sharePreferences",MODE_PRIVATE);
         fs = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
+        firebaseStorage.setMaxUploadRetryTimeMillis(10000);
         storageReference = firebaseStorage.getReference();
         btnContinue.setEnabled(false);
         btnContinue.setOnClickListener(new View.OnClickListener() {
@@ -129,6 +130,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     ImageConstant.selectedImageBitmap = receiptBM;
+                                    progress.setVisibility(View.GONE);
                                     Intent intent = new Intent(getApplicationContext(),ClaimResultActivity.class);
                                     intent.putExtra("claimObj",claim);
                                     startActivity(intent);
@@ -136,6 +138,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
+                                    progress.setVisibility(View.GONE);
                                     Toast.makeText(getApplicationContext(), "Claim has not been created correctly. Please check your connection and try again.", Toast.LENGTH_SHORT).show();
                                 }
                             });
@@ -143,6 +146,7 @@ public class ExtractedInfoActivity extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            progress.setVisibility(View.GONE);
                             Toast.makeText(getApplicationContext(), "Claim has not been created. Please check your connection and try again.", Toast.LENGTH_SHORT).show();
                         }
                     });
