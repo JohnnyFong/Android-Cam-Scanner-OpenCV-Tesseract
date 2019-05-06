@@ -70,6 +70,10 @@ public class ExtractedInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_extracted_info);
+
+        getSupportActionBar().setTitle("Create Claim");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         receiptBM = ImageConstant.selectedImageBitmap;
         ImageConstant.selectedImageBitmap = null;
         imageView = findViewById(R.id.imageView);

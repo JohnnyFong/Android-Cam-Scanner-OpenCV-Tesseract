@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
@@ -35,11 +36,22 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp">
 
-            <!--<ImageView android:src="@drawable/logo"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="72dp"-->
-                <!--android:layout_marginBottom="24dp"-->
-                <!--android:layout_gravity="center_horizontal" />-->
+            <ImageView app:srcCompat="@drawable/ezclaim_no_background"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginBottom="24dp"
+                android:layout_gravity="center_horizontal"
+                />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:fontFamily="@font/gabriela"
+                android:text="EzClaim"
+                android:id="@+id/logo"
+                android:focusableInTouchMode="true"
+                android:textSize="40dp" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

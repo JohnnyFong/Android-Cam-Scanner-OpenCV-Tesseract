@@ -75,6 +75,10 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getSupportActionBar().setTitle("Receipt Photo");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         ImageMethod = getIntent().getIntExtra("ImageMethod",0); //get the request code from previous activity
         // check if ImageMethod, if is 0, go back
         if(ImageMethod != 0) {

@@ -34,6 +34,7 @@ public class ClaimResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_claim_result);
+        getSupportActionBar().setTitle("Claim Submitted");
         FrameLayout frameLayout = findViewById(R.id.frameLayout);
         Snackbar snackbar = Snackbar.make(frameLayout, "Claim has been successfully created.", Snackbar.LENGTH_LONG);
 

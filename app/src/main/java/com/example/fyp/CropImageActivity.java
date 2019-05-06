@@ -44,6 +44,9 @@ public class CropImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crop_image);
 
+        getSupportActionBar().setTitle("Crop Receipt");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         opencvUtils = new OpenCVUtils();
         btnContinue = findViewById(R.id.btnContinue);
         ImageCrop = findViewById(R.id.ImageCrop);

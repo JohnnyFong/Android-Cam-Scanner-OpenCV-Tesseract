@@ -6,20 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".RegisterActivity">
 
-    <!--Progress bar-->
-    <RelativeLayout
-        android:id="@+id/loadingPanel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal" >
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
-
-    </RelativeLayout>
 
     <!--register form-->
     <ScrollView
@@ -36,14 +23,24 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingLeft="24dp"
+                android:paddingTop="56dp"
                 android:paddingRight="24dp">
 
-                <ImageView
-                    android:id="@+id/logo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="72dp"
+                <ImageView app:srcCompat="@drawable/ezclaim_no_background"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_marginBottom="24dp"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="24dp" />
+                    android:focusableInTouchMode="true"
+                    android:id="@+id/logo"/>
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="EzClaim"
+                    android:textSize="40dp"
+                    app:fontFamily="@font/gabriela" />
 
                 <!--  Name Label -->
                 <android.support.design.widget.TextInputLayout
@@ -167,5 +164,20 @@
         </RelativeLayout>
 
     </ScrollView>
+
+    <!--Progress bar-->
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal" >
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+
+    </RelativeLayout>
 
 </android.widget.FrameLayout>

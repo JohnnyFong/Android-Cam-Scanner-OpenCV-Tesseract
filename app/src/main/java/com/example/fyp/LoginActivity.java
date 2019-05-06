@@ -11,6 +11,7 @@ import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +32,7 @@ public class LoginActivity extends AppCompatActivity  {
     // UI references.
     private AutoCompleteTextView inputEmail;
     private EditText inputPassword;
-    private TextView registerText;
+    private TextView registerText, logo;
     private FirebaseAuth fireAuth;
     private SharedPreferences sharedPreferences;
 
@@ -85,7 +86,9 @@ public class LoginActivity extends AppCompatActivity  {
 
             inputEmail = (AutoCompleteTextView) findViewById(R.id.input_email);
             inputPassword = (EditText) findViewById(R.id.input_password);
-
+//            inputPassword.requestFocus();
+            logo = findViewById(R.id.logo);
+            logo.requestFocus();
 
             Button mEmailSignInButton = (Button) findViewById(R.id.btn_signin);
             mEmailSignInButton.setOnClickListener(new OnClickListener() {

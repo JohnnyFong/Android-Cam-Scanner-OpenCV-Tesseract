@@ -10,9 +10,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fyp.utils.Department;
@@ -39,8 +41,10 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ScrollView profileScroll;
     private EditText inputEmail, inputName, inputPhnum;
-    private Button btnUpdate, btnReset;
+    private Button btnUpdate;
     private Spinner departmentSpiner, managerSpinner;
+    private TextView btnReset;
+    private ImageView profileImage;
 
     private User user;
     private Department d;
@@ -67,6 +71,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        getSupportActionBar().setTitle("My Profile");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         profileScroll = findViewById(R.id.profile_scroll);
         profileScroll.setVerticalScrollBarEnabled(false);
         profileScroll.setHorizontalScrollBarEnabled(false);
@@ -78,6 +85,8 @@ public class ProfileActivity extends AppCompatActivity {
         inputName = findViewById(R.id.input_name);
         departmentSpiner = findViewById(R.id.department_spinner);
         managerSpinner = findViewById(R.id.manager_spinner);
+        profileImage = findViewById(R.id.profileImage);
+        profileImage.requestFocus();
 
         progress = findViewById(R.id.loadingPanel);
 
@@ -111,7 +120,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "A password reset email has been sent to "+user.getEmail()+ ". Please log in again with the new password.",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "A password reset email has been sent to "+user.getEmail()+ ". Please check the email.",Toast.LENGTH_LONG).show();
                     auth.signOut();
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.clear();

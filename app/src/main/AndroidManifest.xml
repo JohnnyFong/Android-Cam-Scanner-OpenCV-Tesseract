@@ -33,17 +33,23 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ez_image_asset_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ViewMyClaimActivity"></activity>
         <activity android:name=".ClaimResultActivity" />
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".ExtractedInfoActivity" />
-        <activity android:name=".CroppedImageActivity" />
-        <activity android:name=".CropImageActivity" />
-        <activity android:name=".CameraActivity" />
+        <activity android:name=".ProfileActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".RegisterActivity"
+            android:theme="@style/AppTheme.NoActionBarNoTitle"/>
+        <activity android:name=".ExtractedInfoActivity"
+            />
+        <activity android:name=".CroppedImageActivity"
+            />
+        <activity android:name=".CropImageActivity"
+            />
+        <activity android:name=".CameraActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
@@ -52,7 +58,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LoginActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBarNoTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -25,6 +25,9 @@ public class CroppedImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cropped_image);
 
+        getSupportActionBar().setTitle("Cropped Receipt photo");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         btnContinue = findViewById(R.id.btnContinue);
         imageView = findViewById(R.id.imageView);
         selectedImageBM = ImageConstant.selectedImageBitmap;
