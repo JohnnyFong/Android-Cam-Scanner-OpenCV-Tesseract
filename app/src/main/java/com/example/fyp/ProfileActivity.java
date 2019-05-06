@@ -185,7 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //for each department found add it to the adapter for department spinner
                         Department d = document.toObject(Department.class);
-//                        d.setId(document.getId());
+                        d.setId(document.getId());
                         departments.add(d);
                     }
                     // update the spinner
