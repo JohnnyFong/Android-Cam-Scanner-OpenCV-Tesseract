@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 2);
             }
         });
 
@@ -109,6 +109,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(savedInstanceState == null){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ScanDocFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_dashboard);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        // check if the request code is same as what is passed  here it is 2
+        if(requestCode==2)
+        {
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("CurrentUser", null);
+            User u = gson.fromJson(json, User.class);
+            if(u!=null){
+                title.setText(u.getName());
+                subtitle.setText(u.getEmail());
+            }
+
+            //do the things u wanted
         }
     }
 

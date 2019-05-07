@@ -1,10 +1,15 @@
 package com.example.fyp;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Patterns;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -66,6 +71,8 @@ public class ProfileActivity extends AppCompatActivity {
     List<User> lineManagers = new ArrayList<>();
     ArrayList<String> managers;
 
+    AlertDialog.Builder builder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,9 +85,12 @@ public class ProfileActivity extends AppCompatActivity {
         profileScroll.setVerticalScrollBarEnabled(false);
         profileScroll.setHorizontalScrollBarEnabled(false);
 
+        builder = new AlertDialog.Builder(this);
+
         btnUpdate = findViewById(R.id.update_button);
         btnReset = findViewById(R.id.reset_button);
         inputEmail = findViewById(R.id.input_email);
+        inputEmail.setFocusable(false);
         inputPhnum = findViewById(R.id.input_phnum);
         inputName = findViewById(R.id.input_name);
         departmentSpiner = findViewById(R.id.department_spinner);
@@ -114,27 +124,74 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void resetPassword(){
-        auth = FirebaseAuth.getInstance();
 
-        auth.sendPasswordResetEmail(user.getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "A password reset email has been sent to "+user.getEmail()+ ". Please check the email.",Toast.LENGTH_LONG).show();
-                    auth.signOut();
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.clear();
-                    Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Unable to reset password. Please make sure the email is valid and the network connection are stable.",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        builder.setMessage("Are you sure to reset password?\nA password reset email will be sent to your inbox.")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        final ProgressDialog progressDialog = new ProgressDialog(ProfileActivity.this, R.style.Theme_AppCompat_DayNight_Dialog);
+                        progressDialog.setIndeterminate(true);
+                        progressDialog.setMessage("Sending reset password email...");
+                        progressDialog.show();
+
+                        auth = FirebaseAuth.getInstance();
+
+                        auth.sendPasswordResetEmail(user.getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(getApplicationContext(), "A password reset email has been sent to "+user.getEmail()+ ". Please check the email.",Toast.LENGTH_LONG).show();
+                                    auth.signOut();
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.clear();
+                                    Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                    finish();
+                                }else{
+                                    progressDialog.dismiss();
+                                    Toast.makeText(getApplicationContext(), "Unable to reset password. Please make sure the email is valid and the network connection are stable.",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //  Action for 'NO' Button
+                        dialog.cancel();
+                    }
+                });
+        //Creating dialog box
+        AlertDialog alert = builder.create();
+        //Setting the title manually
+        alert.setTitle("Reset Password");
+        alert.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent=new Intent();
+        setResult(2,intent);
+        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Respond to the action bar's Up/Home button
+                onBackPressed();
+                return false;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateProfile(){
+        boolean flag = true;
+
         progress.setVisibility(View.VISIBLE);
         email = inputEmail.getText().toString().trim();
         name = inputName.getText().toString();
@@ -144,26 +201,52 @@ public class ProfileActivity extends AppCompatActivity {
         User u = (User) managerSpinner.getSelectedItem();
         lineManager = u.getId();
 
-        updateUser = new User(fireUser.getUid(),name,email,phnum,department,lineManager);
+        if(email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            inputEmail.setError("Please enter a valid Email.");
+            flag = false;
+        }else{
+            inputEmail.setError(null);
+        }
 
-        fireStore.collection("users").document(fireUser.getUid()).set(updateUser).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                Gson gson = new Gson();
-                String json = gson.toJson(updateUser);
-                editor.putString("CurrentUser", json);
-                editor.apply();
-                progress.setVisibility(View.GONE);
-                Toast.makeText(getApplicationContext(), "User profile has been updated" , Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Something went wrong. User not created. Please try again later." , Toast.LENGTH_SHORT).show();
+        if(name.isEmpty()){
+            inputName.setError("Please enter your name.");
+            flag = false;
+        }else{
+            inputName.setError(null);
+        }
 
-            }
-        });
+        if(phnum.isEmpty() || !Patterns.PHONE.matcher(phnum).matches()){
+            inputPhnum.setError("Please enter a valid phone number.");
+            flag = false;
+        }else{
+            inputPhnum.setError(null);
+        }
+
+        if(flag){
+            updateUser = new User(fireUser.getUid(),name,email,phnum,department,lineManager);
+
+            fireStore.collection("users").document(fireUser.getUid()).set(updateUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(updateUser);
+                    editor.putString("CurrentUser", json);
+                    editor.apply();
+                    progress.setVisibility(View.GONE);
+                    Toast.makeText(getApplicationContext(), "User profile has been updated" , Toast.LENGTH_SHORT).show();
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(), "Something went wrong. User not updated. Please try again later." , Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            progress.setVisibility(View.GONE);
+        }
+
     }
 
     private void loadProfile(){

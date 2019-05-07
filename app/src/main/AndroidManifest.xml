@@ -39,7 +39,7 @@
         <activity android:name=".ViewMyClaimActivity"></activity>
         <activity android:name=".ClaimResultActivity" />
         <activity android:name=".ProfileActivity"
-            android:parentActivityName=".MainActivity"/>
+            />
         <activity android:name=".RegisterActivity"
             android:theme="@style/AppTheme.NoActionBarNoTitle"/>
         <activity android:name=".ExtractedInfoActivity"
