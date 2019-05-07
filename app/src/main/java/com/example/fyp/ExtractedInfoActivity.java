@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -103,6 +104,17 @@ public class ExtractedInfoActivity extends AppCompatActivity {
         //get the bitmap from ImageConstant and do OCR
         AsyncOcrTask task = new AsyncOcrTask();
         task.execute();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Respond to the action bar's Up/Home button
+                onBackPressed();
+                return false;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void createClaim(){
