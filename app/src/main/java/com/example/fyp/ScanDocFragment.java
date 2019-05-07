@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -77,6 +78,8 @@ public class ScanDocFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scan_document, container,false);
+
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Dashboard");
 
         fab = view.findViewById(R.id.fab);
         cameraFab = view.findViewById(R.id.camera_fab);
